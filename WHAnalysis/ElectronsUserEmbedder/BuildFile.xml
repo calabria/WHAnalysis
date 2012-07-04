@@ -1,0 +1,30 @@
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="FWCore/PluginManager"/>
+<use   name="FWCore/ServiceRegistry"/>
+<use   name="FWCore/MessageLogger"/>
+<use   name="FWCore/Utilities"/>
+<use   name="DataFormats/ParticleFlowCandidate"/>
+<use   name="DataFormats/CLHEP"/>
+<use   name="DataFormats/PatCandidates"/>
+<use   name="DataFormats/JetReco"/>
+<use   name="DataFormats/HepMCCandidate"/>
+<use   name="DataFormats/GsfTrackReco"/>
+<use   name="DataFormats/Math"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="GeneratorInterface/LHEInterface"/>
+<use   name="PhysicsTools/HepMCCandAlgos"/>
+<use   name="HiggsAnalysis/HiggsToWW2Leptons"/>
+<use   name="MagneticField/Engine"/>
+<use   name="MagneticField/Records"/>
+<use   name="DataFormats/EgammaReco"/>
+<use   name="DataFormats/EgammaCandidates"/>
+<use   name="CondCore/EgammaPlugins"/>
+<use   name="RecoEgamma/EgammaTools"/>
+<use   name="boost"/>
+<use   name="rootcore"/>
+<use   name="rootrflx"/>
+<flags EDM_PLUGIN="1"/>
+<export>
+   <lib name="1"/>
+</export>

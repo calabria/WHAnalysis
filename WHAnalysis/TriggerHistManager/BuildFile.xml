@@ -1,0 +1,21 @@
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/PluginManager"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="FWCore/MessageLogger"/>
+<use   name="DataFormats/Math"/>
+<use   name="DataFormats/Common"/>
+<use   name="CommonTools/Utils"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="DataFormats/HLTReco"/>
+<use   name="HLTrigger/HLTcore"/>
+<use   name="L1Trigger/GlobalTriggerAnalyzer"/>
+<use   name="SimDataFormats/PileupSummaryInfo"/>
+<use   name="PhysicsTools/PatUtils"/>
+<use   name="PhysicsTools/PatAlgos"/>
+<flags   EDM_PLUGIN="1"/>
+<export>
+  <lib   name="1"/>
+   <use name="FWCore/Framework"/>
+   <use name="FWCore/PluginManager"/>
+   <use name="FWCore/ParameterSet"/>
+</export>

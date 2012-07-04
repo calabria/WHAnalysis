@@ -1,0 +1,160 @@
+import FWCore.ParameterSet.Config as cms
+
+process = cms.Process("OWNPARTICLES")
+
+process.load("FWCore.MessageService.MessageLogger_cfi")
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.load("WHAnalysis.Configuration.TauMCSelector_cff")
+process.source = cms.Source("PoolSource",
+    # replace 'myfile.root' with the source file you want to use
+    fileNames = cms.untracked.vstring(
+
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_100_0_WTr.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_101_0_LLR.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_102_0_79m.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_103_0_vS1.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_104_0_oyJ.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_105_0_H08.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_106_0_1PX.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_107_0_jzn.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_108_0_ngY.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_109_0_02q.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_10_1_P1m.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_110_0_X4P.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_111_0_h1B.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_112_0_9e9.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_113_0_dJa.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_114_0_UvU.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_115_0_yGm.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_116_0_Uco.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_117_0_JDv.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_118_0_1y5.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_119_0_fJP.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_11_3_283.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_120_0_Qjb.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_121_0_Hwz.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_122_0_lSY.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_123_0_oUR.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_124_0_VdN.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_125_0_bO5.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_126_0_bwL.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_127_0_SHk.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_128_0_YlL.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_129_0_tOa.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_12_1_Xuo.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_130_0_h4D.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_131_0_RXM.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_132_0_XIg.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_133_0_Nlh.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_134_0_DF5.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_135_0_nq7.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_136_0_0lZ.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_137_0_CU1.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_138_0_LFK.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_139_0_lNN.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_13_1_ywC.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_140_1_zpv.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_141_0_TAS.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_142_1_BvD.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_143_0_aYj.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_144_0_GlV.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_145_0_QmM.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_146_0_3ju.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_147_0_j8N.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_148_0_dqg.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_149_0_Cbw.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_14_1_Z4x.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_150_0_YjC.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_151_1_89k.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_152_0_rIK.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_153_0_KQS.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_154_0_J1g.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_155_0_dIA.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_156_0_7t4.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_157_0_IIV.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_158_0_DC9.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_159_0_ZSq.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_15_1_HGe.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_160_0_DdE.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_161_0_f4P.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_162_0_h8c.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_163_0_njB.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_164_0_DGA.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_165_0_uSP.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_166_0_YCf.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_167_0_aYg.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_168_0_lbp.root",
+"file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/DYToTauTau/patTuple_169_1_HlS.root",
+
+
+
+
+  
+        
+    )
+)
+
+
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
+process.particleListDrawer = cms.EDAnalyzer("ParticleListDrawer",
+    	maxEventsToPrint = cms.untracked.int32(1000),
+        printVertex = cms.untracked.bool(False),                                            
+    	src = cms.InputTag('genParticles')
+  )
+
+
+
+#process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
+#process.printTree = cms.EDAnalyzer("ParticleListDrawer",
+#  maxEventsToPrint = cms.untracked.int32(1),
+#  printVertex = cms.untracked.bool(False),
+#  src = cms.InputTag("genParticles")
+#)
+
+
+
+#process.particleListDrawer = cms.EDAnalyzer("ParticleListDrawer",
+#     	maxEventsToPrint = cms.untracked.int32(1),
+#    	src = cms.InputTag('genParticles')
+#  )
+
+
+
+
+process.myProducerLabel = cms.EDProducer('FactorizationDY',
+     taus = cms.untracked.InputTag("selectedPatTaus"),
+     genParticles= cms.untracked.InputTag("genParticles"),                                   
+     idBisnonna= cms.untracked.int32(23),
+)
+
+process.out = cms.OutputModule("PoolOutputModule",
+    fileName = cms.untracked.string('myOutputFile.root')
+)
+
+  
+process.p = cms.Path(process.particleListDrawer 
+                     #process.myProducerLabel 
+                     )
+
+
+
+process.e = cms.EndPath(process.out)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

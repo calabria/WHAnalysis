@@ -1,0 +1,21 @@
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/PluginManager"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="DataFormats/Common"/>
+<use   name="DataFormats/Candidate"/>
+<use   name="CommonTools/RecoAlgos"/>
+<use   name="DataFormats/PatCandidates"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="CommonTools/CandUtils"/>
+<use   name="LHAPDF"/>
+<use   name="rootrflx"/>
+<use   name="DataFormats/MuonReco"/>
+<use   name="DataFormats/TrackReco"/>
+<use   name="SimGeneral/HepPDTRecord"/>
+<use   name="clhep"/>
+<use   name="DataFormats/L1GlobalTrigger"/>
+<use   name="DataFormats/HepMCCandidate"/>
+<flags   EDM_PLUGIN="1"/>
+<export>
+  <lib   name="1"/>
+</export>

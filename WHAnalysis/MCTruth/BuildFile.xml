@@ -1,0 +1,36 @@
+<use   name="FWCore/Utilities"/>
+<use   name="DataFormats/Common"/>
+<use   name="DataFormats/EgammaReco"/>
+<use   name="DataFormats/HepMCCandidate"/>
+<use   name="DataFormats/Math"/>
+<use   name="DataFormats/PatCandidates"/>
+<use   name="SimDataFormats/PileupSummaryInfo"/>
+<use   name="RecoEgamma/EgammaTools"/>
+<use   name="PhysicsTools/UtilAlgos"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="DQMServices/Core"/>
+<use   name="FWCore/ServiceRegistry"/>
+<use   name="DataFormats/EgammaCandidates"/>
+<use   name="RecoEcal/EgammaCoreTools"/>
+<use   name="DataFormats/RecoCandidate"/>
+<use   name="DataFormats/Candidate"/>
+<use   name="PhysicsTools/PatUtils"/>
+<use   name="PhysicsTools/PatAlgos"/>
+<use   name="CommonTools/Utils"/>
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/PluginManager"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="FWCore/MessageLogger"/>
+<use   name="PhysicsTools/HepMCCandAlgos"/>
+<use name="SimDataFormats/GeneratorProducts"/>
+<use name="GeneratorInterface/Core"/>
+<use name="clhep"/>
+<use name="root"/>
+<use name="hepmc"/> 
+<use name="heppdt"/>
+<use name="SimGeneral/HepPDTRecord"/>
+<use name="CommonTools/RecoAlgos"/>
+<flags EDM_PLUGIN="1"/>
+<export>
+   <lib name="1"/>
+</export>

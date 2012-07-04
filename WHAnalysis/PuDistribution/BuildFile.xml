@@ -1,0 +1,14 @@
+<use name="FWCore/Framework"/>
+<use name="FWCore/PluginManager"/>
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/Utilities"/>
+<use name="SimDataFormats/PileupSummaryInfo"/>
+<use name="CommonTools/UtilAlgos"/>
+<use name="DQMServices/Core"/>
+<use name="root"/>
+<use name="FWCore/ServiceRegistry"/>
+<use name="CommonTools/Utils"/>
+<flags EDM_PLUGIN="1"/>
+<export>
+   <lib name="1"/>
+</export>

@@ -1,0 +1,21 @@
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/PluginManager"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="FWCore/MessageLogger"/>
+<use   name="FWCore/ServiceRegistry"/>
+<use   name="DataFormats/Math"/>
+<use   name="DataFormats/RecoCandidate"/>
+<use   name="DataFormats/Candidate"/>
+<use   name="DataFormats/Common"/>
+<use   name="DataFormats/PatCandidates"/>
+<use   name="PhysicsTools/PatUtils"/>
+<use   name="PhysicsTools/PatAlgos"/>
+<use   name="CommonTools/Utils"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="DataFormats/MuonReco"/>
+<use   name="DataFormats/METReco"/>
+<use   name="DataFormats/TrackReco"/>
+<use   name="RecoVertex/KalmanVertexFit"/>
+<export>
+   <lib name="1"/>
+</export>

@@ -1,0 +1,241 @@
+
+// -*- C++ -*-
+//
+// Package:    
+// Class:      
+// 
+/**\class 
+
+ Description: [one line class summary]
+
+ Implementation:
+     [Notes on implementation]
+*/
+//
+// Original Author:  Cesare Calabria
+//         Created:  Mon Sep  5 00:41:24 CEST 2011
+// $Id$
+//
+//
+
+
+// system include files
+#include <memory>
+#include <map>
+#include <string>
+#include <cmath>
+#include <vector>
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDProducer.h"
+
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/Common/interface/View.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenRunInfoProduct.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/Math/interface/deltaPhi.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/TauReco/interface/PFTauDecayMode.h"
+
+using namespace reco;
+
+//
+// class declaration
+//
+
+class FactorizationDY : public edm::EDProducer {
+   public:
+      explicit FactorizationDY(const edm::ParameterSet&);
+      ~FactorizationDY();
+
+      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+
+   private:
+      virtual void beginJob() ;
+      virtual void produce(edm::Event&, const edm::EventSetup&);
+      virtual void endJob() ;
+      
+      virtual void beginRun(edm::Run&, edm::EventSetup const&);
+      virtual void endRun(edm::Run&, edm::EventSetup const&);
+      virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+      virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+
+      // ----------member data ---------------------------
+
+      edm::InputTag genParticleSrc_;
+      edm::InputTag tauSrc_;
+      int idBisnonna_;
+ 
+
+
+};
+
+//
+// constants, enums and typedefs
+//
+
+
+//
+// static data member definitions
+//
+
+//
+// constructors and destructor
+//
+FactorizationDY::FactorizationDY(const edm::ParameterSet& iConfig):
+  genParticleSrc_(iConfig.getUntrackedParameter<edm::InputTag>("genParticles")),
+  tauSrc_(iConfig.getUntrackedParameter<edm::InputTag>("taus")),
+   idBisnonna_(iConfig.getUntrackedParameter<int>("idBisnonna"))
+{
+   //register your products
+
+  produces<pat::TauCollection>( "TausGenMatch" ).setBranchAlias( "TausGenMatch");
+}
+
+
+FactorizationDY::~FactorizationDY()
+{
+ 
+   // do anything here that needs to be done at desctruction time
+   // (e.g. close files, deallocate resources etc.)
+
+}
+
+
+//
+// member functions
+//
+
+// ------------ method called to produce the data  ------------
+void
+FactorizationDY::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+    using namespace edm;
+    using namespace std;
+    
+  bool matchTau = false;
+ 
+  
+  edm::Handle<reco::GenParticleCollection> genParticles;
+  iEvent.getByLabel(genParticleSrc_, genParticles);
+  
+  std::auto_ptr<pat::TauCollection> TausGenMatch(new pat::TauCollection);
+  
+   edm::Handle<edm::View<pat::Tau> > taus;
+   iEvent.getByLabel(tauSrc_,taus);
+ 
+ 
+   for(edm::View<pat::Tau>::const_iterator tau=taus->begin(); tau!=taus->end(); ++tau){
+    double phiReco = tau->phi();
+    double etaReco = tau->eta();
+ 
+    if(genParticles.isValid()){
+
+      for(reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end(); it++ ){
+	  
+	  int id = it->pdgId();
+	  int status =it->status();
+	  //double phiGen =it->phi();
+	  //double etaGen=it->eta();
+
+	  if (id==23 && status==3) {
+	    std::cout<<"sono una Z"<<std::endl; 
+	  int numFigli=it->numberOfDaughters();
+	  std::cout<<"id="<<id<<"status Z="<<status<<"  "<<"num figli"<<numFigli<<std::endl;
+	  
+	  for ( int i = 0; i < numFigli; i++ ){
+	    const  Candidate *  Figli_Z = it->daughter(i);
+	    int dauId = Figli_Z->pdgId();
+	    int statusFigliZ = Figli_Z->status();
+	    std::cout<<"Figlio Z:  id ="<<dauId<<"  "<<"status="<<statusFigliZ<<"  "<<"num figli"<<numFigli<<std::endl;
+	    if (TMath::Abs(dauId)==15){
+	      double phiGen =it->phi();
+	      double etaGen=it->eta();
+	      double dR = deltaR(etaGen, phiGen, etaReco, phiReco);
+	      std::cout<<"deltaR"<<dR<<std::endl;
+	      if (dR<0.3){
+		matchTau = true;
+		std::cout<<"deltaR"<<dR<<std::endl;
+	      }
+	    
+	    }
+	  }
+
+	
+	  }
+	  //else matchTau=false;
+	  
+	  
+
+
+	
+
+	}//fine for genParticle
+
+	
+
+    }//fine is.valid   
+     //if(matchTau) TausGenMatch->push_back(*tau);
+
+ }//fine for tau
+//iEvent.put(TausGenMatch, "TausGenMatch");
+}
+ 
+
+
+// ------------ method called once each job just before starting event loop  ------------
+void 
+FactorizationDY::beginJob()
+{
+}
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+FactorizationDY::endJob() {
+}
+
+// ------------ method called when starting to processes a run  ------------
+void 
+FactorizationDY::beginRun(edm::Run&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when ending the processing of a run  ------------
+void 
+FactorizationDY::endRun(edm::Run&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when starting to processes a luminosity block  ------------
+void 
+FactorizationDY::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when ending the processing of a luminosity block  ------------
+void 
+FactorizationDY::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+{
+}
+
+// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+void
+FactorizationDY::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  //The following says we do not know what parameters are allowed so do no validation
+  // Please change this to state exactly what you do use, even if it is no parameters
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+  descriptions.addDefault(desc);
+}
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(FactorizationDY);

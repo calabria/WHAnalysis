@@ -1,0 +1,8 @@
+%MSG-s ConfigFileReadError:  (NoModuleName) 25-May-2012 15:19:22 CEST pre-events
+Problem with configuration file ztautauveto_cfg.py
+---- Configuration BEGIN
+python encountered the error: <type 'exceptions.NameError'> name 'vecMC' is not defined
+---- Configuration END
+
+
+%MSG

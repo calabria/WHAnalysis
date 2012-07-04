@@ -1,0 +1,31 @@
+import FWCore.ParameterSet.Config as cms
+
+process = cms.Process("OWNPARTICLES")
+
+process.load("FWCore.MessageService.MessageLogger_cfi")
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.load("WHAnalysis.Configuration.MCSelector_cff")
+process.source = cms.Source("PoolSource",
+    # replace 'myfile.root' with the source file you want to use
+    fileNames = cms.untracked.vstring(
+        'file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/WH/patTuple_248_1_pxs.root',
+        'file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/WH/patTuple_160_1_yth.root',
+        'file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/WH/patTuple_227_2_n1x.root',
+         'file:/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC/WH/patTuple_122_3_kbE.root',
+        
+    )
+)
+
+#process.myProducerLabel = cms.EDProducer('MCTruth'
+#)
+
+
+process.out = cms.OutputModule("PoolOutputModule",
+    fileName = cms.untracked.string('myOutputFile.root')
+)
+
+  
+process.p = cms.Path(process.MCSequence)
+
+process.e = cms.EndPath(process.out)

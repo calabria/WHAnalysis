@@ -1,0 +1,731 @@
+// -*- C++ -*-
+//
+// Package:    HistoAdder
+// Class:      HistoAdder
+// 
+/**\class HistoAdder HistoAdder.cc HistoAdder/HistoAdder/src/HistoAdder.cc
+
+ Description: [one line class summary]
+
+ Implementation:
+     [Notes on implementation]
+*/
+//
+// Original Author:  Cesare Calabria
+//         Created:  Fri Jun 17 16:32:41 CEST 2011
+// $Id$
+//
+//
+
+
+// system include files
+#include <memory>
+
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+//Root
+#include "TFile.h"
+#include "TKey.h"
+
+#include "TClass.h"
+#include "TAxis.h"
+#include "TF1.h"
+#include "TH1F.h"
+#include "TH1.h"
+#include "TH2F.h"
+#include "TH2D.h"
+#include "TROOT.h"
+#include "TMath.h"
+#include "TCanvas.h"
+#include "TTree.h"
+#include "TGaxis.h"
+#include <TStyle.h>
+#include "TText.h"
+#include "TPaveText.h"
+#include "TH1D.h"
+#include "TGraphErrors.h"
+#include "THStack.h"
+#include "TLegend.h"
+#include <string>
+#include <fstream>
+#include <iostream>
+
+//
+// class declaration
+//
+
+using namespace std;
+using namespace edm;
+
+class HistoAdder : public edm::EDAnalyzer {
+   public:
+      explicit HistoAdder(const edm::ParameterSet&);
+      ~HistoAdder();
+       TFile * fileIn;
+       TFile * fileOut;
+
+      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+
+
+   private:
+      virtual void beginJob() ;
+      virtual void analyze(const edm::Event&, const edm::EventSetup&);
+      virtual void endJob() ;
+
+      virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+      virtual void endRun(edm::Run const&, edm::EventSetup const&);
+      virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
+      virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
+
+      typedef std::vector<std::string> vstring;
+      typedef std::vector<double> vdouble;
+
+      vdouble crossSections_;
+      vstring samples_;
+      vstring labels_;
+      vstring path_;
+      vdouble setColors_;
+      vdouble legendDim_;
+      double intLumi_;
+      bool logScale_;
+      std::string eventsIn_;
+      std::string data_;
+      //vdouble skimEff_;
+      //vdouble filterEff_;
+      vdouble scatterPlots_;
+      int group_;
+
+      bool nostack_;
+
+
+
+      // ----------member data ---------------------------
+};
+
+//
+// constants, enums and typedefs
+//
+
+//
+// static data member definitions
+//
+
+//
+// constructors and destructor
+//
+HistoAdder::HistoAdder(const edm::ParameterSet& iConfig)
+
+{
+   //now do what ever initialization is needed
+
+    crossSections_ = iConfig.getUntrackedParameter<vdouble>("crossSections");
+    path_ = iConfig.getUntrackedParameter<vstring>("path");
+    samples_ = iConfig.getUntrackedParameter<vstring>("samples");
+    labels_ = iConfig.getUntrackedParameter<vstring>("labels");
+    intLumi_ = iConfig.getUntrackedParameter<double>("intLumi");
+    logScale_ = iConfig.getUntrackedParameter<bool>("logScale");
+    setColors_ = iConfig.getUntrackedParameter<vdouble>("setColors");
+    legendDim_ = iConfig.getUntrackedParameter<vdouble>("legendDim");
+    eventsIn_ = iConfig.getUntrackedParameter<std::string>("eventsIn");
+    data_ = iConfig.getUntrackedParameter<std::string>("data");
+    nostack_ = iConfig.getUntrackedParameter<bool>("nostack");
+    //skimEff_ = iConfig.getUntrackedParameter<vdouble>("skimEff");
+    //filterEff_ = iConfig.getUntrackedParameter<vdouble>("filterEff");
+    scatterPlots_ = iConfig.getUntrackedParameter<vdouble>("scatterPlots");
+    group_ = iConfig.getUntrackedParameter<int>("group");
+}
+
+
+HistoAdder::~HistoAdder()
+{
+
+   // do anything here that needs to be done at desctruction time
+   // (e.g. close files, deallocate resources etc.)
+
+}
+
+
+//
+// member functions
+//
+
+// ------------ method called for each event  ------------
+void
+HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+   using namespace edm;
+
+#ifdef THIS_IS_AN_EVENT_EXAMPLE
+   Handle<ExampleData> pIn;
+   iEvent.getByLabel("example",pIn);
+#endif
+   
+#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
+   ESHandle<SetupData> pSetup;
+   iSetup.get<SetupRecord>().get(pSetup);
+#endif
+
+  std::vector<std::string> dirStructure;
+  std::vector<std::string> histoStructure;
+  std::vector<std::string> histoNamesForSaving;
+  std::vector<double> eventsAtBeginning;
+  std::vector<int> histoType;
+  std::vector<int> xBins;
+  std::vector<int> yBins;
+  std::vector<double> xMin;
+  std::vector<double> xMax;
+  std::vector<double> yMin;
+  std::vector<double> yMax;
+  std::vector<double> puWeights;
+  std::vector<double> scaleFactors;
+  dirStructure.clear();
+  histoStructure.clear();
+  bool flag = true;
+
+  std::string nameAndPath = path_[0] + samples_[0];
+  TFile * fileIn = TFile::Open(nameAndPath.c_str());
+  TIter next(fileIn->GetListOfKeys());
+  TKey *key;
+  while ((key=(TKey*)next())) {
+	//std::cout<<"key: "<<key->GetName()<<" points to an object of class:"<<key->GetClassName()<<std::endl;
+	std::string folder = key->GetName();
+	if (folder== "puDistribution" || folder == "TriggerHistosBeforeSel" || folder == "TriggerHistosAfterSel" ) continue;
+	dirStructure.push_back(folder);
+	//gDirectory->pwd();
+        fileIn->cd();
+        gDirectory->cd(folder.c_str());
+	TIter next2(gDirectory->GetListOfKeys());
+  	TKey *key2;
+	while ((key2=(TKey*)next2())) {
+		//std::cout<<"key: "<<key2->GetName()<<" points to an object of class:"<<key2->GetClassName()<<std::endl;
+		TObject * obj = key2->ReadObj();
+		std::string histoName = key2->GetName();
+		std::string folderHisto = folder + "/" + histoName;
+		std::string namesForSaving = folder + "_" + histoName;
+		//std::cout<<"folderHisto "<<folderHisto.c_str()<<std::endl;
+		if(obj->IsA()->InheritsFrom("TH2")){
+			histoType.push_back(1);
+			TH2F *histoTMP = (TH2F*)gDirectory->Get(histoName.c_str());
+			int xBins_ = histoTMP->GetXaxis()->GetNbins();
+			int yBins_ = histoTMP->GetYaxis()->GetNbins();
+			xBins.push_back(xBins_);
+			yBins.push_back(yBins_);
+			double xMin_ = histoTMP->GetXaxis()->GetXmin();
+			double xMax_ = histoTMP->GetXaxis()->GetXmax();
+			xMin.push_back(xMin_);
+			xMax.push_back(xMax_);
+			double yMin_ = histoTMP->GetYaxis()->GetXmin();
+			double yMax_ = histoTMP->GetYaxis()->GetXmax();
+			//std::cout<<histoName.c_str()<<" "<<xBins_<<" "<<xMin_<<" "<<xMax_<<" "<<yBins_<<" "<<yMin_<<" "<<yMax_<<std::endl;
+			yMin.push_back(yMin_);
+			yMax.push_back(yMax_);}
+		else if(obj->IsA()->InheritsFrom("TH1")){
+			histoType.push_back(0);
+			TH1F *histoTMP = (TH1F*)gDirectory->Get(histoName.c_str());
+			int xBins_ = histoTMP->GetXaxis()->GetNbins();
+			int yBins_ = 0;
+			xBins.push_back(xBins_);
+			yBins.push_back(yBins_);
+			double xMin_ = histoTMP->GetXaxis()->GetXmin();
+			double xMax_ = histoTMP->GetXaxis()->GetXmax();
+			xMin.push_back(xMin_);
+			xMax.push_back(xMax_);
+			double yMin_ = 0;
+			double yMax_ = 0;
+			//std::cout<<histoName.c_str()<<" "<<xBins_<<" "<<xMin_<<" "<<xMax_<<std::endl;
+			yMin.push_back(yMin_);
+			yMax.push_back(yMax_);}
+		histoStructure.push_back(folderHisto);
+		histoNamesForSaving.push_back(namesForSaving);
+	}
+  }
+
+  //std::cout<<"folder "<<dirStructure.size()<<std::endl;
+
+  int sizeHistos = histoStructure.size();
+  int sizeFiles = samples_.size();
+  int numFolders = dirStructure.size();
+  //std::cout<<"sizeHistos "<<sizeHistos<<std::endl;
+  //std::cout<<"sizeFiles "<<sizeFiles<<std::endl;
+
+  //// This is to calculate scale factors
+
+   for(int i = 0; i < sizeFiles; i++){
+
+	std::string nameAndPath;
+	nameAndPath = path_[i] + samples_[i];
+	//std::cout<<"sample "<<nameAndPath<<std::endl;
+	TFile * fileIn = TFile::Open(nameAndPath.c_str());
+	TH1F *histoTMP = (TH1F*)gDirectory->Get(eventsIn_.c_str());
+	double events = histoTMP->GetBinContent(2);
+	//std::cout<<"events at beginning "<<events<<std::endl;
+	eventsAtBeginning.push_back(events);
+	fileIn->Close();
+
+   }
+
+   //// Stacked plots ////
+
+   for(int k = 0; k < sizeHistos; k++){//Loop sugli istogrammi
+
+	//std::cout<<histoType[k]<<std::endl;
+	if(histoType[k] == 0){
+
+   	   TCanvas * cvStack = new TCanvas("","",1000,700);
+   	   THStack * hs = new THStack(histoStructure[k].c_str(),histoStructure[k].c_str());
+      	   TLegend * legend = new TLegend(legendDim_[0],legendDim_[1],legendDim_[2],legendDim_[3]);
+	   std::string titleXaxis;
+	   //Double_t binWidth = 0;
+	   cvStack->SetFillColor(10);
+
+	   if(logScale_) gPad->SetLogy();
+
+	   for(int i = 0; i < sizeFiles; i++){//Loop sui file
+
+			   std::string nameAndPath;
+			   nameAndPath = path_[i] + samples_[i];
+		   	   std::cout<<"sample "<<nameAndPath<<std::endl;
+			   TFile * fileIn = TFile::Open(nameAndPath.c_str());
+			   fileIn->cd();
+			   std::cout<<"histoName "<<histoStructure[k].c_str()<<std::endl;
+			   TH1F *histoTMP = (TH1F*)gDirectory->Get(histoStructure[k].c_str());
+			   //double nEntries = histoTMP->GetEntries();
+			   //double Li = eventsAtBeginning[i] / (crossSections_[i] * filterEff_[i] * skimEff_[i]);
+			   double Li = eventsAtBeginning[i] / crossSections_[i];
+			   //std::cout<<"Li "<<Li<<std::endl;
+			   double scaleFactor = intLumi_ / Li;
+			   if(flag) scaleFactors.push_back(scaleFactor);
+			   //std::cout<<"scale factor "<<scaleFactor<<std::endl;
+			   //double scaledEvents = nEntries * scaleFactor;
+			   histoTMP->Scale(scaleFactor);
+			   histoTMP->SetLineColor(1);
+			   histoTMP->SetFillColor(setColors_[i]);
+		 	   histoTMP->SetFillStyle(1000);
+			   titleXaxis = histoTMP->GetXaxis()->GetTitle();
+			   //binWidth = histoTMP->GetBinWidth(1);
+			   //std::cout<<"label "<<titleXaxis.c_str()<<std::endl;
+			   hs->Add(histoTMP);
+			   legend->AddEntry(histoTMP, labels_[i].c_str(), "f");
+			   fileIn->Close();
+
+	   }
+	   flag = false;
+
+	   //// Cosmetics ////	
+
+	   if(logScale_) hs->SetMinimum(0.0001);
+	   else hs->SetMinimum(0);
+	   //std::cout<<"label "<<titlexAxis.c_str()<<std::endl;
+	   hs->Draw();
+	   if(titleXaxis != "") hs->GetXaxis()->SetTitle(titleXaxis.c_str());
+	   //std::stringstream ss;
+	   //ss<<binWidth;
+	   //std::string width = ss.str();
+	   //std::string titleYaxis = "Events/(" + width + ")";
+	   hs->GetYaxis()->SetTitle("Events");
+	   double maxMC = hs->GetMaximum();
+	   double maxData = 0;
+	   //std::cout<<"sono qui"<<std::endl;
+	   if(data_ != ""){
+	   	TFile * fileData = TFile::Open(data_.c_str());
+	   	TH1F *histoData = (TH1F*)gDirectory->Get(histoStructure[k].c_str());
+	   	legend->AddEntry(histoData, "Data", "p");
+		histoData->SetMarkerColor(1);
+		histoData->SetMarkerStyle(20);
+		histoData->SetMarkerSize(0.5);
+		histoData->Draw("SAME, ep");
+		maxData = histoData->GetMaximum();
+	   	//std::cout<<"sono qui"<<std::endl;
+	   	fileData->Close();
+		}
+	   double max = std::max(maxData, maxMC);
+	   if(max != 0) hs->SetMaximum(max);
+	   legend->SetFillColor(10);
+	   legend->Draw();
+	   //std::cout<<"sono qui"<<std::endl;
+           std::string saveName = "./plots_stack/" + histoNamesForSaving[k] + ".png";
+	   //std::cout<<"sono qui "<<saveName.c_str()<<std::endl;
+	   cvStack->Print(saveName.c_str());
+	   //std::cout<<"sono qui"<<std::endl;
+	   delete hs;
+	   delete cvStack;
+	   delete legend;
+
+	}
+   }
+
+
+   //// Scatter plots ////
+
+   /*for(int k = 0; k < sizeHistos; k++){//Loop sugli istogrammi
+
+	if(histoType[k] == 1){
+
+   	   TCanvas * cvStack = new TCanvas("","",1000,700);
+   	   TH2F * hs = new TH2F(histoStructure[k].c_str(),histoStructure[k].c_str(),xBins[k],xMin[k],xMax[k],yBins[k],yMin[k],yMax[k]);
+      	   TLegend * legend = new TLegend(legendDim_[0],legendDim_[1],legendDim_[2],legendDim_[3]);
+	   std::string titleXaxis;
+	   std::string titleYaxis;
+	   cvStack->SetFillColor(10);
+
+	   //if(logScale_) gPad->SetLogy();
+
+	   hs->Draw();
+	   for(int i = 0; i < sizeFiles; i++){//Loop sui file
+
+			   std::string nameAndPath;
+			   nameAndPath = path_[i] + samples_[i];
+		   	   std::cout<<"sample "<<nameAndPath<<std::endl;
+			   TFile * fileIn = TFile::Open(nameAndPath.c_str());
+			   fileIn->cd();
+			   std::cout<<"histoName "<<histoStructure[k].c_str()<<std::endl;
+			   TH2F *histoTMP = (TH2F*)gDirectory->Get(histoStructure[k].c_str());
+			   double Li = eventsAtBeginning[i] / (crossSections_[i] * filterEff_[i] * skimEff_[i]);
+			   double scaleFactor = intLumi_ / Li;
+			   histoTMP->Scale(scaleFactor);
+			   histoTMP->SetMarkerColor(setColors_[i]);
+		 	   histoTMP->SetMarkerSize(0.8);
+			   histoTMP->SetMarkerStyle(20);
+			   titleXaxis = histoTMP->GetXaxis()->GetTitle();
+			   titleYaxis = histoTMP->GetYaxis()->GetTitle();
+			   double nEntries = histoTMP->GetEntries();
+
+			   if(scatterPlots_[i] == 1 && nEntries != 0){
+				histoTMP->Draw("SAME scat=1");
+			   	legend->AddEntry(histoTMP, labels_[i].c_str(), "p");}
+			   fileIn->Close();
+
+	   }
+
+	   //std::cout<<"label "<<titlexAxis.c_str()<<std::endl;
+	   hs->SetStats(kFALSE);
+	   if(titleXaxis != "") hs->GetXaxis()->SetTitle(titleXaxis.c_str());
+	   if(titleYaxis != "") hs->GetYaxis()->SetTitle(titleYaxis.c_str());
+	   legend->SetFillColor(10);
+	   legend->Draw();
+	   
+           std::string saveName = "./plots_stack/" + histoNamesForSaving[k] + ".png";
+	   std::cout<<"saveName "<<saveName.c_str()<<std::endl;
+	   cvStack->Print(saveName.c_str());
+
+	   delete hs;
+	   delete cvStack;
+	   delete legend;
+
+	}
+   }*/
+
+  //// Non stacked plots ////
+
+  if(nostack_){
+   for(int k = 0; k < sizeHistos; k++){//Loop sugli istogrammi
+
+	if(histoType[k] == 0){
+
+   	   TCanvas * cvStack = new TCanvas("","",1000,700);
+      	   TLegend * legend = new TLegend(legendDim_[0],legendDim_[1],legendDim_[2],legendDim_[3]);
+   	   THStack * hs = new THStack(histoStructure[k].c_str(),histoStructure[k].c_str());
+	   std::string titleXaxis;
+	   cvStack->SetFillColor(10);
+
+	   if(logScale_) gPad->SetLogy();
+
+	   for(int i = 0; i < sizeFiles; i++){//Loop sui file
+		   std::string nameAndPath;
+		   nameAndPath = path_[i] + samples_[i];
+	   	   std::cout<<"sample "<<nameAndPath<<std::endl;
+		   TFile * fileIn = TFile::Open(nameAndPath.c_str());
+		   fileIn->cd();
+		   std::cout<<"histoName "<<histoStructure[k].c_str()<<std::endl;
+		   TH1F *histoTMP = (TH1F*)gDirectory->Get(histoStructure[k].c_str());
+		   //double nEntries = histoTMP->GetEntries();
+		   //double Li = eventsAtBeginning[i] / (crossSections_[i] * filterEff_[i] * skimEff_[i]);
+		   double Li = eventsAtBeginning[i] / crossSections_[i];
+		   double scaleFactor = intLumi_ / Li;
+		   //std::cout<<"scale factor "<<scaleFactor<<std::endl;
+		   //double scaledEvents = nEntries * scaleFactor;
+		   histoTMP->Scale(scaleFactor);
+		   histoTMP->SetLineColor(setColors_[i]);
+		   histoTMP->SetLineWidth(2);
+		   histoTMP->SetFillColor(setColors_[i]);
+	 	   histoTMP->SetFillStyle(0);
+		   titleXaxis = histoTMP->GetXaxis()->GetTitle();
+		   hs->Add(histoTMP);
+		   legend->AddEntry(histoTMP, labels_[i].c_str(), "l");
+		   fileIn->Close();
+
+	   }
+
+
+	   if(logScale_) hs->SetMinimum(0.001);
+	   else hs->SetMinimum(0);
+	   hs->Draw("nostack");
+	   if(titleXaxis != "") hs->GetXaxis()->SetTitle(titleXaxis.c_str());
+	   hs->GetYaxis()->SetTitle("Events");
+	   legend->SetFillColor(10);
+	   legend->Draw();
+
+           std::string saveName = "./plots_nostack/" + histoNamesForSaving[k] + ".png";
+	   cvStack->Print(saveName.c_str());
+
+	   delete hs;
+	   delete cvStack;
+	   delete legend;
+
+	}
+
+   }
+
+  }
+
+  //// Final table ////
+
+  std::cout<<"\n"<<setfill('-')<<setw(100)<<"-"<<endl;
+  std::cout<<"Final table"<<std::endl;
+  std::cout<<setfill('-')<<setw(100)<<"-"<<endl;
+
+  std::cout<<"\n ";
+  for(int i = 0; i < sizeFiles; i++){
+
+	std::cout<<labels_[i]<<" Err. ";
+
+  }
+  std::cout<<"Data Err."<<std::endl;
+
+  for(int j = 0; j < numFolders; j++){
+
+	std::string name = dirStructure[j] + "/N_eventi_PU";
+	//std::cout<<"name "<<name.c_str()<<std::endl;
+	std::cout<<"|"<<dirStructure[j].c_str()<<"|";
+
+  	for(int i = 0; i < sizeFiles; i++){
+
+		std::string nameAndPath;
+		nameAndPath = path_[i] + samples_[i];
+		//std::cout<<"sample "<<nameAndPath<<std::endl;
+		TFile * fileIn = TFile::Open(nameAndPath.c_str());
+		fileIn->cd();
+		//double Li = eventsAtBeginning[i] / (crossSections_[i] * filterEff_[i] * skimEff_[i]);
+		double Li = eventsAtBeginning[i] / crossSections_[i];
+		double scaleFactor = intLumi_ / Li;
+		TH1F *histoTMP = (TH1F*)gDirectory->Get(name.c_str());
+		double numEvents = histoTMP->GetBinContent(2);
+		//std::cout<<"dirStructure "<<dirStructure[j].c_str()<<"events "<<numEvents<<std::endl;
+		double radqEvt = TMath::Sqrt(numEvents);
+		std::cout<<" "<<fixed<<setprecision(3)<<numEvents*scaleFactor<<" "<<fixed<<setprecision(3)<<scaleFactor*radqEvt;
+		fileIn->Close();
+	}
+
+	if(data_ != ""){
+		TFile * fileData = TFile::Open(data_.c_str());
+		fileData->cd();
+	   	TH1F *histoData = (TH1F*)gDirectory->Get(name.c_str());
+		double numEvents = histoData->GetBinContent(2);
+		double radqEvt = TMath::Sqrt(numEvents);
+		std::cout<<" "<<fixed<<setprecision(3)<<numEvents<<" "<<fixed<<setprecision(3)<<radqEvt;
+		fileData->Close();
+	}
+
+	std::cout<<" "<<std::endl;
+
+  }
+
+  //// Efficienze assolute ////
+
+  std::cout<<"\n"<<setfill('-')<<setw(100)<<"-"<<endl;
+  std::cout<<"Absolute efficiencies"<<std::endl;
+  std::cout<<setfill('-')<<setw(100)<<"-"<<endl;
+
+  //TH1F * effPlot = new TH1F("","",numFolders,0,numFolders);
+
+  std::cout<<"\n ";
+  for(int i = 0; i < sizeFiles; i++){
+
+	std::cout<<labels_[i]<<" Err. ";
+
+  }
+  std::cout<<"Data Err."<<std::endl;
+
+  for(int j = 0; j < numFolders; j++){
+
+	//effPlot->GetXaxis()->SetBinLabel(j, dirStructure[j].c_str());
+
+	std::string name = dirStructure[j] + "/N_eventi_PU";
+	//std::cout<<"name "<<name.c_str()<<std::endl;
+	std::cout<<"|"<<dirStructure[j].c_str()<<"|";
+
+  	for(int i = 0; i < sizeFiles; i++){
+
+		std::string nameAndPath;
+		nameAndPath = path_[i] + samples_[i];
+		//std::cout<<"sample "<<nameAndPath<<std::endl;
+		TFile * fileIn = TFile::Open(nameAndPath.c_str());
+		fileIn->cd();
+		TH1F *histoTMP = (TH1F*)gDirectory->Get(name.c_str());
+		TH1F *histoTMPEvt = (TH1F*)gDirectory->Get("VertexHistosBeforeMCFilter/N_eventi_PU");
+		double numEvents = histoTMP->GetBinContent(2);
+		double eventsAtBeginning = histoTMPEvt->GetBinContent(2);
+		//std::cout<<"dirStructure "<<dirStructure[j].c_str()<<"events "<<numEvents<<std::endl;
+		double absEff = 0;
+		double errEff = 0;
+		if(eventsAtBeginning){
+			absEff = numEvents/eventsAtBeginning;
+			errEff = TMath::Sqrt(numEvents + absEff*absEff*eventsAtBeginning)/eventsAtBeginning;}
+		std::cout<<" "<<fixed<<setprecision(10)<<absEff<<" "<<fixed<<setprecision(10)<<errEff;
+		fileIn->Close();
+	}
+
+	if(data_ != ""){
+		TFile * fileData = TFile::Open(data_.c_str());
+		fileData->cd();
+	   	TH1F *histoData = (TH1F*)gDirectory->Get(name.c_str());
+		TH1F *histoTMPEvt = (TH1F*)gDirectory->Get("VertexHistosBeforeMCFilter/N_eventi_PU");
+		double numEvents = histoData->GetBinContent(2);
+		double eventsAtBeginning = histoTMPEvt->GetBinContent(2);
+		double absEff = 0;
+		double errEff = 0;
+		if(eventsAtBeginning){
+			absEff = numEvents/eventsAtBeginning;
+			errEff = TMath::Sqrt(numEvents + absEff*absEff*eventsAtBeginning)/eventsAtBeginning;}
+		std::cout<<" "<<fixed<<setprecision(10)<<absEff<<" "<<fixed<<setprecision(10)<<errEff;
+		fileData->Close();
+	}
+
+	std::cout<<" "<<std::endl;
+
+  }
+
+  //// Efficienze relative ////
+
+  std::vector<double> tmpEvt;
+
+  std::cout<<"\n"<<setfill('-')<<setw(100)<<"-"<<endl;
+  std::cout<<"Relative efficiencies"<<std::endl;
+  std::cout<<setfill('-')<<setw(100)<<"-"<<endl;
+
+  std::cout<<"\n ";
+  for(int i = 0; i < sizeFiles; i++){
+
+	std::cout<<labels_[i]<<" Err. ";
+
+  }
+  std::cout<<"Data Err."<<std::endl;
+
+  for(int j = 0; j < numFolders; j++){
+
+	std::vector<double> actualEvt;
+  	bool firstCycle = true;
+
+	std::string name = dirStructure[j] + "/N_eventi_PU";
+	//std::cout<<"name "<<name.c_str()<<std::endl;
+	std::cout<<"|"<<dirStructure[j].c_str()<<"|";
+
+  	for(int i = 0; i < sizeFiles; i++){
+
+		std::string nameAndPath;
+		nameAndPath = path_[i] + samples_[i];
+		//std::cout<<"sample "<<nameAndPath<<std::endl;
+		TFile * fileIn = TFile::Open(nameAndPath.c_str());
+		fileIn->cd();
+		TH1F *histoTMP = (TH1F*)gDirectory->Get(name.c_str());
+		double numEvents = histoTMP->GetBinContent(2);
+		if(firstCycle) tmpEvt.push_back(numEvents);
+		actualEvt.push_back(numEvents);
+		//std::cout<<"dirStructure "<<dirStructure[j].c_str()<<"events "<<numEvents<<std::endl;
+		fileIn->Close();
+	}
+
+	if(data_ != ""){
+		TFile * fileData = TFile::Open(data_.c_str());
+		fileData->cd();
+	   	TH1F *histoData = (TH1F*)gDirectory->Get(name.c_str());
+		double numEvents = histoData->GetBinContent(2);
+		if(firstCycle) tmpEvt.push_back(numEvents);
+		actualEvt.push_back(numEvents);
+		fileData->Close();
+	}
+
+	firstCycle = false;
+
+	int sizeEvtVec = actualEvt.size();
+	for(int i = 0; i < sizeEvtVec; i++){
+		double relEff = 0;
+		double errEff = 0;
+		if(tmpEvt[i] != 0){
+			relEff = actualEvt[i]/tmpEvt[i];
+			errEff = TMath::Sqrt(actualEvt[i] + relEff*relEff*tmpEvt[i])/tmpEvt[i];}
+		std::cout<<" "<<fixed<<setprecision(10)<<relEff<<" "<<fixed<<setprecision(10)<<errEff;
+	}
+
+	std::cout<<" "<<std::endl;
+	tmpEvt.clear();
+	tmpEvt = actualEvt;
+	actualEvt.clear();
+
+  }//Fine loop sulla struttura interna
+
+  int sizeScaleFactors = scaleFactors.size();
+  std::cout<<"\n"<<setfill('-')<<setw(100)<<"-"<<endl;
+  std::cout<<"Scale factors"<<std::endl;
+  std::cout<<setfill('-')<<setw(100)<<"-"<<endl;
+  for(int i = 0; i < sizeScaleFactors; i++){std::cout<<scaleFactors[i]<<" ";}
+  std::cout<<"\n"<<setfill('-')<<setw(100)<<"-"<<endl;
+
+}
+
+
+// ------------ method called once each job just before starting event loop  ------------
+void 
+HistoAdder::beginJob()
+{
+}
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+HistoAdder::endJob() 
+{
+}
+
+// ------------ method called when starting to processes a run  ------------
+void 
+HistoAdder::beginRun(edm::Run const&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when ending the processing of a run  ------------
+void 
+HistoAdder::endRun(edm::Run const&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when starting to processes a luminosity block  ------------
+void 
+HistoAdder::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when ending the processing of a luminosity block  ------------
+void 
+HistoAdder::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+{
+}
+
+// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+void
+HistoAdder::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  //The following says we do not know what parameters are allowed so do no validation
+  // Please change this to state exactly what you do use, even if it is no parameters
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+  descriptions.addDefault(desc);
+}
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(HistoAdder);
