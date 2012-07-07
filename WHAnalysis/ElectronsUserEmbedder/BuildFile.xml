@@ -21,6 +21,7 @@
 <use   name="DataFormats/EgammaCandidates"/>
 <use   name="CondCore/EgammaPlugins"/>
 <use   name="RecoEgamma/EgammaTools"/>
+<use   name="EGamma/EGammaAnalysisTools"/>
 <use   name="boost"/>
 <use   name="rootcore"/>
 <use   name="rootrflx"/>
