@@ -14,6 +14,11 @@
 <use   name="CommonTools/UtilAlgos"/>
 <use   name="GeneratorInterface/LHEInterface"/>
 <use   name="PhysicsTools/HepMCCandAlgos"/>
+<use   name="Muon/MuonAnalysisTools"/>
+<use   name="TrackingTools/TrajectoryState"/>
+<use   name="TrackingTools/TransientTrack"/>
+<use   name="TrackingTools/Records"/>
+<use   name="TrackingTools/PatternTools"/>
 <use   name="boost"/>
 <use   name="rootcore"/>
 <use   name="rootrflx"/>
