@@ -14,7 +14,6 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.PyReleaseValidation.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 
-
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 
@@ -22,9 +21,8 @@ process.source = cms.Source("PoolSource",
 
         ),
 
-
 )
-
+process.source.skipBadFiles = cms.untracked.bool( True )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #################################################################################################################################
