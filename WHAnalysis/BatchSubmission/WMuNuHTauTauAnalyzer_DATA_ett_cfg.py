@@ -28,13 +28,13 @@ process.source = cms.Source("PoolSource",
 #    eventsToProcess = cms.untracked.VEventRange('176697:287:400630856',
 #						'179563:270:431171291')
 
-    eventsToProcess = cms.untracked.VEventRange('175866:41:36928984',
-						'176548:837:1480643933',
-						'178365:547:893391215',
-					       )
+#    eventsToProcess = cms.untracked.VEventRange('175866:41:36928984',
+#						'176548:837:1480643933',
+#						'178365:547:893391215',
+#					       )
 
 )
-
+process.source.skipBadFiles = cms.untracked.bool( True )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #################################################################################################################################
@@ -153,7 +153,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 #################################################################################################################################
 
 process.selectedEvents = cms.EDAnalyzer('SelectedEvents',
-	path = cms.untracked.string("/cmshome/calabria/Events/EventsETT/"),
+	path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Events/EventsETT/"),
         muonSrc = cms.untracked.InputTag("muonVariables"),
 	eleSrc = cms.untracked.InputTag("electronVariables"),
 	tauSrc = cms.untracked.InputTag("tauVariables"),
