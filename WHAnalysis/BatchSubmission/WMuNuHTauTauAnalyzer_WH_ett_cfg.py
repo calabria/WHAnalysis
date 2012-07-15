@@ -51,8 +51,8 @@ process.hltSelection.hltEventRanges = cms.VEventRange("160404:MIN-163869:MAX",
 						      "170249:MIN-173198:MAX",
 						      "173236:MIN-173692:MAX",
 						      "175860:MIN-180252:MAX")
-process.hltSelection.defaultTrigger = cms.string("HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_v")
-#process.hltSelection.defaultTrigger = cms.string("")
+#process.hltSelection.defaultTrigger = cms.string("HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_v")
+process.hltSelection.defaultTrigger = cms.string("")
 
 process.TriggerHistosBeforeSel.hltResultsSource = cms.InputTag('TriggerResults::HLT')
 process.TriggerHistosBeforeSel.hltPaths = cms.vstring('HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_v')
@@ -129,6 +129,7 @@ process.eePairsVetoAfterSel.isMC = cms.untracked.bool(isMCBool.value())
 process.CompCandHistosBeforeSel.isMC = cms.untracked.bool(isMCBool.value())
 process.CompCandHistosBeforeZttVeto.isMC = cms.untracked.bool(isMCBool.value())
 process.CompCandHistosAfterSel.isMC = cms.untracked.bool(isMCBool.value())
+process.CompCandHistosAfterSelLt.isMC = cms.untracked.bool(isMCBool.value())
 
 #################################################################################################################################
 
@@ -180,6 +181,7 @@ process.mypath = cms.Path(process.producesUserDefinedVarsEle *
 			  process.tauSequence *
 			  process.VertexHistosForPU *
 			  process.jetSequence *
+			  process.selectedMETMax *
 			  process.selectedTau1Tau2 *
 			  process.TauTauSequence *
 			  process.selectedEleTau1Tau2Cand *
@@ -193,6 +195,8 @@ process.mypath = cms.Path(process.producesUserDefinedVarsEle *
 			 	  process.CompCandHistosBeforeZttVeto *
 			  	  process.ztautauVeto *
 			  process.CompCandHistosAfterSel *
+			  process.selectedCompCandUW *
+			  process.CompCandHistosAfterSelLt *
 			  (process.MuonHistosFinal + process.EleHistosFinal + process.TauHistosFinal1 + process.TauHistosFinal2 + process.DiTauHistosFinal)
 			  #process.mcMatching *
 			  #process.compositeCandidateSequenceMcAssignment *
