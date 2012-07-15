@@ -163,6 +163,57 @@ double mediumIsoFRMVA(double pt){
 	return w;
 }
 
+///////////// For AntiEleMVA All Jets
+//W+Jets
+double tightIsoFRMVA1(double pt){
+
+	double mpv = -2.69836e+00;
+	double sigma = 3.16786e+00;
+	double costante = 4.91172e-03;
+   
+    	double fakeTau = ((TMath::Landau(pt,mpv,sigma))+costante);  
+	double w = fakeTau/(1-fakeTau);
+
+	return w;
+}
+
+double mediumIsoFRMVA1(double pt){
+
+	double mpv = -9.66504e-01;
+	double sigma = 3.25437e+00;
+	double costante = 5.35769e-03;
+
+     	double fakeTau = ((TMath::Landau(pt,mpv,sigma))+costante);
+	double w = fakeTau/(1-fakeTau);
+
+	return w;
+}
+//Z+Jets
+double tightIsoFRMVA2(double pt){
+
+	double mpv = -1.75866e+00 ;
+	double sigma = 3.97941e+00;
+	double costante = 2.35451e-03;
+   
+    	double fakeTau = ((TMath::Landau(pt,mpv,sigma))+costante);  
+	double w = fakeTau/(1-fakeTau);
+
+	return w;
+}
+
+double mediumIsoFRMVA2(double pt){
+
+	double mpv = -2.95074e-01;
+	double sigma = 4.06744e+00;
+	double costante = 3.34852e-03;
+
+     	double fakeTau = ((TMath::Landau(pt,mpv,sigma))+costante);
+	double w = fakeTau/(1-fakeTau);
+
+	return w;
+}
+
+
 //
 // static data member definitions
 //
@@ -244,11 +295,13 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
 
 ///////////////////////////////////////////////////////////// FR /////////////////////////////////////////////////////////////
 
+  std::vector<double> candWeights;
+  double weightPU = 0;
   if(isFR_){
 
-	  double weightPU = 0;
-
 	  for(edm::View<reco::CompositeCandidate>::const_iterator CompCand=CompCandidates->begin(); CompCand!=CompCandidates->end(); ++CompCand){
+
+		double weightPUSingle = 0;
 
 		const Candidate * WLeptonCand = CompCand->daughter(0); //Candidato leptone dal W
 		const Candidate * DiTauCand = CompCand->daughter(1); //Candidato composito DiTau
@@ -265,20 +318,24 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
 		double WLeptonCandPt = WLeptonCand->pt();
 
 		if(WLeptonDiTauCand1ChargeProd > 0){
-			weightPU += tightIsoFR(DiTauCand1Pt);
-			histContainer_["weightLep_1"]->Fill(tightIsoFR(DiTauCand1Pt));
+			weightPUSingle = (tightIsoFRMVA1(DiTauCand1Pt) + tightIsoFRMVA2(DiTauCand1Pt))/2;
+			weightPU += (tightIsoFRMVA1(DiTauCand1Pt) + tightIsoFRMVA2(DiTauCand1Pt))/2;
+			histContainer_["weightLep_1"]->Fill((tightIsoFRMVA1(DiTauCand1Pt) + tightIsoFRMVA2(DiTauCand1Pt))/2);
 			std::cout<<"PT1: "<<DiTauCand1Pt<<" chargeProd1: "<<WLeptonDiTauCand1ChargeProd<<" weight1: "<<tightIsoFRMVA(DiTauCand1Pt)<<std::endl;
 		}
 		else if(WLeptonDiTauCand2ChargeProd > 0){
-		 	weightPU += mediumIsoFR(DiTauCand2Pt);
-	   		histContainer_["weightLep_2"]->Fill(mediumIsoFR(DiTauCand2Pt));
+		 	weightPUSingle = (mediumIsoFRMVA2(DiTauCand2Pt) + mediumIsoFRMVA2(DiTauCand2Pt))/2;
+		 	weightPU += (mediumIsoFRMVA2(DiTauCand2Pt) + mediumIsoFRMVA2(DiTauCand2Pt))/2;
+	   		histContainer_["weightLep_2"]->Fill((mediumIsoFRMVA2(DiTauCand2Pt) + mediumIsoFRMVA2(DiTauCand2Pt))/2);
 			std::cout<<"PT2: "<<DiTauCand2Pt<<" chargeProd2: "<<WLeptonDiTauCand2ChargeProd<<" weight2: "<<mediumIsoFRMVA(DiTauCand2Pt)<<std::endl;
 		}
 
-	  }
+		candWeights.push_back(weightPUSingle);
 
-	  if(weightPU) weight *= weightPU;
-	  std::cout<<"Tot Weight: "<<weightPU<<std::endl;
+	  }
+	  
+	  //if(weightPU) weight *= weightPU;
+	  //std::cout<<"Tot Weight: "<<weightPU<<std::endl;
 
   }
 
@@ -289,7 +346,12 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
 
   double met = pfmet->front().et();
 
+  int indexCand = 0;
   for(edm::View<reco::CompositeCandidate>::const_iterator CompCand=CompCandidates->begin(); CompCand!=CompCandidates->end(); ++CompCand){
+
+	double weightTMP = 1;
+	if(candWeights[indexCand] && isFR_) weightTMP = candWeights[indexCand];
+	else weightTMP = weight;
 
 	const Candidate * WLeptonCand = CompCand->daughter(0); //Candidato leptone dal W
 	const Candidate * DiTauCand = CompCand->daughter(1); //Candidato composito DiTau
@@ -344,73 +406,87 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
 	//std::cout<<"metPt: "<<metPt<<" metEt: "<<metEt<<std::endl; 
 	//std::cout<<"Mt: "<<Mt<<" Mt2: "<<Mt2<<std::endl; 
 
-	histContainer_["hWLeptonTau1Charge"]->Fill(WLeptonDiTauCand1Charge, weight);
-	histContainer_["hWLeptonTau2Charge"]->Fill(WLeptonDiTauCand2Charge, weight);
+	histContainer_["hWLeptonTau1Charge"]->Fill(WLeptonDiTauCand1Charge, weightTMP);
+	histContainer_["hWLeptonTau2Charge"]->Fill(WLeptonDiTauCand2Charge, weightTMP);
+
+	histContainer2D_["metVsDiTauMass"]->Fill(massHiggs, met, weightTMP);
 
 	if(mostEnergetic){ 
-		histContainer_["hWLeptonLeadTauCharge"]->Fill(WLeptonDiTauCand1Charge, weight);
-		histContainer_["hWLeptonSubLeadTauCharge"]->Fill(WLeptonDiTauCand2Charge, weight);
+		histContainer_["hWLeptonLeadTauCharge"]->Fill(WLeptonDiTauCand1Charge, weightTMP);
+		histContainer_["hWLeptonSubLeadTauCharge"]->Fill(WLeptonDiTauCand2Charge, weightTMP);
 
-		histContainer_["hMassWLeptonLeadTau"]->Fill(massWLeptonDiTauCand1, weight);
-		histContainer_["hMassWLeptonSubLeadTau"]->Fill(massWLeptonDiTauCand2, weight);
+		histContainer_["hMassWLeptonLeadTau"]->Fill(massWLeptonDiTauCand1, weightTMP);
+		histContainer_["hMassWLeptonSubLeadTau"]->Fill(massWLeptonDiTauCand2, weightTMP);
 
-		histContainer2D_["hMassWLeptonLeadTauVsPtHiggs"]->Fill(massWLeptonDiTauCand1, higgsPt, weight);
-		histContainer2D_["hMassWLeptonSubLeadTauVsPtHiggs"]->Fill(massWLeptonDiTauCand2, higgsPt, weight);
+		histContainer2D_["hMassWLeptonLeadTauVsPtHiggs"]->Fill(massWLeptonDiTauCand1, higgsPt, weightTMP);
+		histContainer2D_["hMassWLeptonSubLeadTauVsPtHiggs"]->Fill(massWLeptonDiTauCand2, higgsPt, weightTMP);
 
-		histContainer2D_["hMassWLeptonLeadTauVsMET"]->Fill(massWLeptonDiTauCand1, met, weight);
-		histContainer2D_["hMassWLeptonSubLeadTauVsMET"]->Fill(massWLeptonDiTauCand2, met, weight);
+		histContainer2D_["hMassWLeptonLeadTauVsMET"]->Fill(massWLeptonDiTauCand1, met, weightTMP);
+		histContainer2D_["hMassWLeptonSubLeadTauVsMET"]->Fill(massWLeptonDiTauCand2, met, weightTMP);
 
-		histContainer_["hCosDPhiELeadTau"]->Fill(cosTau1, weight);
-		histContainer2D_["hCosDPhiELeadTauVsMT"]->Fill(Mt, cosTau1, weight);
-		histContainer_["hCosDPhiESubLeadTau"]->Fill(cosTau2, weight);
-		histContainer2D_["hCosDPhiESubLeadTauVsMT"]->Fill(Mt, cosTau2, weight);
+		histContainer_["hCosDPhiELeadTau"]->Fill(cosTau1, weightTMP);
+		histContainer2D_["hCosDPhiELeadTauVsMT"]->Fill(Mt, cosTau1, weightTMP);
+		histContainer_["hCosDPhiESubLeadTau"]->Fill(cosTau2, weightTMP);
+		histContainer2D_["hCosDPhiESubLeadTauVsMT"]->Fill(Mt, cosTau2, weightTMP);
+
+		histContainer2D_["ptVsDiTauMassLead"]->Fill(massHiggs, DiTauCand1Pt, weightTMP);
+		histContainer2D_["ptVsDiTauMassSubLead"]->Fill(massHiggs, DiTauCand2Pt, weightTMP);
 	}
 	else{
- 		histContainer_["hWLeptonLeadTauCharge"]->Fill(WLeptonDiTauCand2Charge, weight);
- 		histContainer_["hWLeptonSubLeadTauCharge"]->Fill(WLeptonDiTauCand1Charge, weight);
+ 		histContainer_["hWLeptonLeadTauCharge"]->Fill(WLeptonDiTauCand2Charge, weightTMP);
+ 		histContainer_["hWLeptonSubLeadTauCharge"]->Fill(WLeptonDiTauCand1Charge, weightTMP);
 
-		histContainer_["hMassWLeptonLeadTau"]->Fill(massWLeptonDiTauCand2, weight);
-		histContainer_["hMassWLeptonSubLeadTau"]->Fill(massWLeptonDiTauCand1, weight);
+		histContainer_["hMassWLeptonLeadTau"]->Fill(massWLeptonDiTauCand2, weightTMP);
+		histContainer_["hMassWLeptonSubLeadTau"]->Fill(massWLeptonDiTauCand1, weightTMP);
 
-		histContainer2D_["hMassWLeptonLeadTauVsPtHiggs"]->Fill(massWLeptonDiTauCand2, higgsPt, weight);
-		histContainer2D_["hMassWLeptonSubLeadTauVsPtHiggs"]->Fill(massWLeptonDiTauCand1, higgsPt, weight);
+		histContainer2D_["hMassWLeptonLeadTauVsPtHiggs"]->Fill(massWLeptonDiTauCand2, higgsPt, weightTMP);
+		histContainer2D_["hMassWLeptonSubLeadTauVsPtHiggs"]->Fill(massWLeptonDiTauCand1, higgsPt, weightTMP);
 
-		histContainer2D_["hMassWLeptonLeadTauVsMET"]->Fill(massWLeptonDiTauCand2, met, weight);
-		histContainer2D_["hMassWLeptonSubLeadTauVsMET"]->Fill(massWLeptonDiTauCand1, met, weight);
+		histContainer2D_["hMassWLeptonLeadTauVsMET"]->Fill(massWLeptonDiTauCand2, met, weightTMP);
+		histContainer2D_["hMassWLeptonSubLeadTauVsMET"]->Fill(massWLeptonDiTauCand1, met, weightTMP);
 
-		histContainer_["hCosDPhiELeadTau"]->Fill(cosTau2, weight);
-		histContainer2D_["hCosDPhiELeadTauVsMT"]->Fill(Mt, cosTau2, weight);
-		histContainer_["hCosDPhiESubLeadTau"]->Fill(cosTau1, weight);
-		histContainer2D_["hCosDPhiESubLeadTauVsMT"]->Fill(Mt, cosTau1, weight);
+		histContainer_["hCosDPhiELeadTau"]->Fill(cosTau2, weightTMP);
+		histContainer2D_["hCosDPhiELeadTauVsMT"]->Fill(Mt, cosTau2, weightTMP);
+		histContainer_["hCosDPhiESubLeadTau"]->Fill(cosTau1, weightTMP);
+		histContainer2D_["hCosDPhiESubLeadTauVsMT"]->Fill(Mt, cosTau1, weightTMP);
+
+		histContainer2D_["ptVsDiTauMassLead"]->Fill(massHiggs, DiTauCand2Pt, weightTMP);
+		histContainer2D_["ptVsDiTauMassSubLead"]->Fill(massHiggs, DiTauCand1Pt, weightTMP);
 	}
 
-   	histContainer_["hDiTauCand1Pt"]->Fill(DiTauCand1Pt, weight);
-   	histContainer_["hDiTauCand1Eta"]->Fill(DiTauCand1Eta, weight);
-   	histContainer_["hDiTauCand1Phi"]->Fill(DiTauCand1Phi, weight);
+   	histContainer_["hDiTauCand1Pt"]->Fill(DiTauCand1Pt, weightTMP);
+   	histContainer_["hDiTauCand1Eta"]->Fill(DiTauCand1Eta, weightTMP);
+   	histContainer_["hDiTauCand1Phi"]->Fill(DiTauCand1Phi, weightTMP);
 
-   	histContainer_["hDiTauCand2Pt"]->Fill(DiTauCand2Pt, weight);
-   	histContainer_["hDiTauCand2Eta"]->Fill(DiTauCand2Eta, weight);
-   	histContainer_["hDiTauCand2Phi"]->Fill(DiTauCand2Phi, weight);
+   	histContainer_["hDiTauCand2Pt"]->Fill(DiTauCand2Pt, weightTMP);
+   	histContainer_["hDiTauCand2Eta"]->Fill(DiTauCand2Eta, weightTMP);
+   	histContainer_["hDiTauCand2Phi"]->Fill(DiTauCand2Phi, weightTMP);
 
-   	histContainer_["hWLepCandPt"]->Fill(WLeptonCandPt, weight);
-   	histContainer_["hWLepCandEta"]->Fill(WLeptonCandEta, weight);
-   	histContainer_["hWLepCandPhi"]->Fill(WLeptonCandPhi, weight);
+   	histContainer_["hWLepCandPt"]->Fill(WLeptonCandPt, weightTMP);
+   	histContainer_["hWLepCandEta"]->Fill(WLeptonCandEta, weightTMP);
+   	histContainer_["hWLepCandPhi"]->Fill(WLeptonCandPhi, weightTMP);
 
-   	histContainer_["VisMass"]->Fill(massHiggs, weight);
-	histContainer_["MTeMET"]->Fill(Mt, weight);
+   	histContainer_["VisMass"]->Fill(massHiggs, weightTMP);
+	histContainer_["MTeMET"]->Fill(Mt, weightTMP);
 
-	histContainer_["hCosDPhiETau1"]->Fill(cosTau1, weight);
-	histContainer_["hCosDPhiETau2"]->Fill(cosTau2, weight);
+	histContainer_["hCosDPhiETau1"]->Fill(cosTau1, weightTMP);
+	histContainer_["hCosDPhiETau2"]->Fill(cosTau2, weightTMP);
+
+	++indexCand;
 
   }
 
-  histContainer_["MET"]->Fill(met, weight);
+  double weightOutOfLoop = 1;
+  if(isFR_ && weightPU) weightOutOfLoop = weightPU;
+  else weightOutOfLoop = weight;
+
+  histContainer_["MET"]->Fill(met, weightOutOfLoop);
 
   double count = 1.;
   histContainer_["N_eventi"]->Fill(count);
-  histContainer_["N_eventi_PU"]->Fill(count, weight);
+  histContainer_["N_eventi_PU"]->Fill(count, weightOutOfLoop);
 
-  histContainer_["CompCand_mult"]->Fill(CompCandidates->size(), weight);
+  histContainer_["CompCand_mult"]->Fill(CompCandidates->size(), weightOutOfLoop);
 
 }
 
@@ -454,7 +530,7 @@ CompositeCandHistManager::beginJob()
 
   histContainer2D_["hMtMet"]=fs->make<TH2F>("MtMet", "MtMet", 25, 0., 200., 40, 0., 200.);
 
-  histContainer_["MET"]=fs->make<TH1F>("MET", "met",    40,   0., 200.);
+  histContainer_["MET"]=fs->make<TH1F>("MET", "met",    80,   0., 200.);
   histContainer_["hLt"]=fs->make<TH1F>("Lt", "Lt",50, 0,200);
 
   histContainer_["hWLeptonLeadTauCharge"]=fs->make<TH1F>("WLeptonLeadTauCharge", "WLeptonLeadTauCharge", 7, -3.5, +3.5);
@@ -470,6 +546,10 @@ CompositeCandHistManager::beginJob()
 
   histContainer2D_["hMassWLeptonLeadTauVsMET"]=fs->make<TH2F>("MassWLeptonLeadTauVsMET", "MassWLeptonLeadTauVsMET", 30, 0., 300., 40, 0., 200.);
   histContainer2D_["hMassWLeptonSubLeadTauVsMET"]=fs->make<TH2F>("MassWLeptonSubLeadTauVsMET", "MassWLeptonSubLeadTauVsMET", 30, 0., 300., 40, 0., 200.);
+
+  histContainer2D_["ptVsDiTauMassLead"]=fs->make<TH2F>("ptVsDiTauMassLead", "ptVsDiTauMassLead", 300, 0., 300., 200, 0., 200.);
+  histContainer2D_["ptVsDiTauMassSubLead"]=fs->make<TH2F>("ptVsDiTauMassSubLead", "ptVsDiTauMassSubLead", 300, 0., 300., 200, 0., 200.);
+  histContainer2D_["metVsDiTauMass"]=fs->make<TH2F>("metVsDiTauMass", "metVsDiTauMass", 300, 0., 300., 200, 0., 200.);
 
 ///////////////////////////////////////////////////////////// X axis
 
