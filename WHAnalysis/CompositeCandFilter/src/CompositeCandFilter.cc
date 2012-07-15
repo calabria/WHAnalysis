@@ -90,7 +90,7 @@ CompositeCandFilter::CompositeCandFilter(const edm::ParameterSet& iConfig):
   applyEMuCharge_(iConfig.getUntrackedParameter<bool>("applyEMuCharge"))
 {
    //now do what ever initialization is needed
-   produces<reco::CompositeCandidateCollection>("selectedEleMuTauCompCand").setBranchAlias("selectedEleMuTauCompCand");
+   produces<reco::CompositeCandidateCollection>("");
 }
 
 
@@ -159,7 +159,7 @@ CompositeCandFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	else if(massWLeptonDiTauCand2 > 85 && massWLeptonDiTauCand2 < 95) massVeto = true;
 
 	if(applyEMuCharge_) candResult = resultEt && resultCharge && !massVeto;
-	else candResult = resultEt && !massVeto;
+	else candResult = resultEt /*&& !massVeto*/;
 
 	if(candResult){
 		selectedEleMuTauCompCand->push_back(*CompCand);
@@ -168,7 +168,7 @@ CompositeCandFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    }
 
-   iEvent.put(selectedEleMuTauCompCand, "selectedEleMuTauCompCand");
+   iEvent.put(selectedEleMuTauCompCand);
    return result;
 }
 
