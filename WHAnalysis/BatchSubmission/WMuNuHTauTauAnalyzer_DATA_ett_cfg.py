@@ -139,6 +139,7 @@ process.eePairsVetoAfterSel.isMC = cms.untracked.bool(isMCBool.value())
 process.CompCandHistosBeforeSel.isMC = cms.untracked.bool(isMCBool.value())
 process.CompCandHistosBeforeZttVeto.isMC = cms.untracked.bool(isMCBool.value())
 process.CompCandHistosAfterSel.isMC = cms.untracked.bool(isMCBool.value())
+process.CompCandHistosAfterSelLt.isMC = cms.untracked.bool(isMCBool.value())
 
 #################################################################################################################################
 
@@ -184,6 +185,7 @@ process.mypath = cms.Path(process.producesUserDefinedVarsEle *
 			  process.tauSequence *
 			  process.VertexHistosForPU *
 			  process.jetSequence *
+			  process.selectedMETMax *
 			  process.selectedTau1Tau2 *
 			  process.TauTauSequence *
 			  process.selectedEleTau1Tau2Cand *
@@ -197,6 +199,8 @@ process.mypath = cms.Path(process.producesUserDefinedVarsEle *
 			 	  process.CompCandHistosBeforeZttVeto *
 			  	  process.ztautauVeto *
 			  process.CompCandHistosAfterSel *
+			  process.selectedCompCandUW *
+			  process.CompCandHistosAfterSelLt *
 			  (process.MuonHistosFinal + process.EleHistosFinal + process.TauHistosFinal1 + process.TauHistosFinal2 + process.DiTauHistosFinal) *
 			  #process.mcMatching *
 			  #process.compositeCandidateSequenceMcAssignment *
