@@ -13,37 +13,17 @@ process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
 ## ------------------------------------------------------
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
-#--------------------------------------------------------------------------------
-#
-# configure Jet Energy Corrections
-#
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.jec = cms.ESSource("PoolDBESSource",
-     DBParameters = cms.PSet(
-        messageLevel = cms.untracked.int32(0)
-     ),
-     timetype = cms.string('runnumber'),
-     toGet = cms.VPSet(
-       cms.PSet(
-           record = cms.string('JetCorrectionsRecord'),
-           tag    = cms.string('JetCorrectorParametersCollection_Jec11V2_AK5PF'),
-           label  = cms.untracked.string('AK5PF')
-       ),
-       cms.PSet(
-           record = cms.string('JetCorrectionsRecord'),
-           tag    = cms.string('JetCorrectorParametersCollection_Jec11V2_AK5Calo'),
-           label  = cms.untracked.string('AK5Calo')
-       )
-    ),
-    connect = cms.string('sqlite_fip:TauAnalysis/Configuration/data/Jec11V2.db')
-)
-process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
+process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+process.pfJetMETcorr.offsetCorrLabel = cms.string("ak5PFL1Fastjet")
+process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3")
 
 #--------------------------------------------------------------------------------
 
-process.load('RecoJets.Configuration.RecoPFJets_cff')
+#process.load('RecoJets.Configuration.RecoPFJets_cff')
 process.kt6PFJets.doRhoFastjet = True
 process.kt6PFJets.Rho_EtaMax = cms.double(4.4)
 #process.kt6PFJets.Ghost_EtaMax = cms.double(5.0)
@@ -87,11 +67,11 @@ switchToPFTauHPS(process) # For HPS Taus
 
 # require scraping filter
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
-                                    applyfilter = cms.untracked.bool(True),
-                                    debugOn = cms.untracked.bool(False),
-                                    numtrack = cms.untracked.uint32(10),
-                                    thresh = cms.untracked.double(0.2)
-                                    )
+	applyfilter = cms.untracked.bool(True),
+	debugOn = cms.untracked.bool(False),
+	numtrack = cms.untracked.uint32(10),
+	thresh = cms.untracked.double(0.2)
+)
 
 addSelectedPFlowParticle(process)
 
@@ -174,23 +154,23 @@ process.electronVariables = cms.EDProducer('ElectronsUserEmbedder',
 )
 
 process.skimmedElectrons = cms.EDFilter("PATElectronSelector",
-		src = cms.InputTag("electronVariables"),
-		cut = cms.string('pt >= 12. && abs(eta) < 2.5'),
-		filter = cms.bool(True)
-		)
+	src = cms.InputTag("electronVariables"),
+	cut = cms.string('pt >= 15. && abs(eta) < 2.5'),
+	filter = cms.bool(True)
+)
 
 process.skimmedTaus = cms.EDFilter("PATTauSelector",
-		src = cms.InputTag("tauVariables"),
-          	cut = cms.string('pt >= 12. && abs(eta) < 2.5 && tauID("decayModeFinding") > 0.5 && tauID("byTightCombinedIsolationDeltaBetaCorr") > 0.5'),
-		filter = cms.bool(True)
-		)
+	src = cms.InputTag("tauVariables"),
+	cut = cms.string('pt >= 15. && abs(eta) < 2.5 && tauID("decayModeFinding") > 0.5 && tauID("byLooseCombinedIsolationDeltaBetaCorr") > 0.5'),
+	filter = cms.bool(True)
+)
 
 process.numTaus = cms.EDFilter("PATCandViewCountFilter",
-		src = cms.InputTag("skimmedTaus"),
-		maxNumber = cms.uint32(2000),
-		minNumber = cms.uint32(2),
-		filter = cms.bool(True)
-		)
+	src = cms.InputTag("skimmedTaus"),
+	maxNumber = cms.uint32(2000),
+	minNumber = cms.uint32(2),
+	filter = cms.bool(True)
+)
 
 # load the PU JetID sequence
 process.load("CMGTools.External.pujetidsequence_cff")
@@ -202,96 +182,47 @@ process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3
 process.pfMEtMVA.srcLeptons = cms.VInputTag('cleanPatElectrons', 'cleanPatMuons', 'cleanPatTaus')
 
 process.patPFMetByMVA = process.patMETs.clone(
-  		metSource = cms.InputTag('pfMEtMVA'),
-  		addMuonCorrections = cms.bool(False),
-  		addGenMET = cms.bool(False),
-  		genMETSource = cms.InputTag('genMetTrue')
-		)
+	metSource = cms.InputTag('pfMEtMVA'),
+	addMuonCorrections = cms.bool(False),
+	addGenMET = cms.bool(False),
+	genMETSource = cms.InputTag('genMetTrue')
+)
+
+# load the coreTools of PAT
+from PhysicsTools.PatAlgos.tools.metTools import *
+addTcMET(process, 'TC')
+addPfMET(process, 'PF')
+process.patMETsPF.metSource = cms.InputTag("pfMet")
+
+process.patPFMETsTypeIcorrected = process.patMETs.clone(
+	metSource = cms.InputTag('pfType1CorrectedMet'),
+	addMuonCorrections = cms.bool(False),
+	genMETSource = cms.InputTag('genMetTrue'),
+	addGenMET = cms.bool(False)
+)
 
 process.counter = cms.EDAnalyzer('SimpleCounter')
 process.TFileService = cms.Service("TFileService", fileName = cms.string('histo_counter.root'))
 
 ## let it run
 process.p = cms.Path(
-    process.counter *
-    process.scrapingVeto *
-    process.PFTau *
-    process.fjSequence *
-    process.patDefaultSequence *
-    process.muonVariables *
-    process.electronVariables *
-    process.tauVariables *
-    process.puJetIdSqeuence *
-    process.pfMEtMVAsequence *
-    process.patPFMetByMVA * 
-    process.skimmedElectrons *
-    process.skimmedTaus *
-    process.numTaus
-    )
-
-################################################################################################
-###    P r e p a r a t i o n      o f    t h e    P A T    O b j e c t s   f r o m    A O D  ###
-################################################################################################
-
-## pat sequences to be loaded:
-#process.load("PhysicsTools.PFCandProducer.PF2PAT_cff")
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-#process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff")
-                       
-# load the coreTools of PAT
-from PhysicsTools.PatAlgos.tools.metTools import *
-addTcMET(process, 'TC')
-addPfMET(process, 'PF')
-
-## %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-## modify the final pat sequence: keep only electrons + METS (muons are needed for met corrections)
-process.load("RecoEgamma.EgammaIsolationAlgos.egammaIsolationSequence_cff")
-#process.patElectronIsolation = cms.Sequence(process.egammaIsolationSequence)
-
-process.patElectrons.isoDeposits = cms.PSet()
-process.patElectrons.userIsolation = cms.PSet()
-process.patElectrons.addElectronID = cms.bool(True)
-process.patElectrons.electronIDSources = cms.PSet(
-    simpleEleId95relIso= cms.InputTag("simpleEleId95relIso"),
-    simpleEleId90relIso= cms.InputTag("simpleEleId90relIso"),
-    simpleEleId85relIso= cms.InputTag("simpleEleId85relIso"),
-    simpleEleId80relIso= cms.InputTag("simpleEleId80relIso"),
-    simpleEleId70relIso= cms.InputTag("simpleEleId70relIso"),
-    simpleEleId60relIso= cms.InputTag("simpleEleId60relIso"),
-    simpleEleId95cIso= cms.InputTag("simpleEleId95cIso"),
-    simpleEleId90cIso= cms.InputTag("simpleEleId90cIso"),
-    simpleEleId85cIso= cms.InputTag("simpleEleId85cIso"),
-    simpleEleId80cIso= cms.InputTag("simpleEleId80cIso"),
-    simpleEleId70cIso= cms.InputTag("simpleEleId70cIso"),
-    simpleEleId60cIso= cms.InputTag("simpleEleId60cIso"),    
-    )
-##
-process.patElectrons.addGenMatch = cms.bool(False)
-process.patElectrons.embedGenMatch = cms.bool(False)
-#process.patElectrons.usePV = cms.bool(False)
-##
-process.load("ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff")
-# you have to tell the ID that it is data
-process.simpleEleId95relIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId90relIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId85relIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId80relIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId70relIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId60relIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId95cIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId90cIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId85cIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId80cIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId70cIso.dataMagneticFieldSetUp = cms.bool(True)
-process.simpleEleId60cIso.dataMagneticFieldSetUp = cms.bool(True)
-#
-process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
-process.makePatElectrons = cms.Sequence(process.patElectronIDs*process.patElectrons)
-# process.makePatMuons may be needed depending on how you calculate the MET
-#process.makePatCandidates = cms.Sequence(process.makePatElectrons+process.makePatMETs)
-#process.patDefaultSequence = cms.Sequence(process.makePatCandidates)
-##
-##  ################################################################################
+    	process.counter *
+    	process.scrapingVeto *
+    	process.PFTau *
+    	process.fjSequence *
+    	process.patDefaultSequence *
+  	process.producePFMETCorrections *
+    	process.muonVariables *
+    	process.electronVariables *
+    	process.tauVariables *
+    	process.puJetIdSqeuence *
+    	process.pfMEtMVAsequence *
+    	process.patPFMetByMVA *
+	process.patPFMETsTypeIcorrected *
+	process.skimmedElectrons *
+	process.skimmedTaus *
+	process.numTaus
+)
 
 ## remove MC matching from the default sequence
 #removeMCMatching(process, ['All'])
@@ -301,7 +232,7 @@ addPFMuonIsolation(process,process.patMuons)
 addPFElectronIsolation(process,process.patElectrons)
 
 #
-#process.GlobalTag.globaltag = "START41_V0::All" ##  (according to https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions)
+process.GlobalTag.globaltag = "START42_V17::All" ##  (according to https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions)
 #                                               ##
 process.source.fileNames = [                    ##
 	
