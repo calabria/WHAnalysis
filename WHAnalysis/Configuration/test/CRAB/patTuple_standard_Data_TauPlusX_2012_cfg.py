@@ -1,39 +1,15 @@
 ## import skeleton process
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 5000
 
 process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-
-#--------------------------------------------------------------------------------
-#
-# configure Jet Energy Corrections
-#
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.jec = cms.ESSource("PoolDBESSource",
-     DBParameters = cms.PSet(
-        messageLevel = cms.untracked.int32(0)
-     ),
-     timetype = cms.string('runnumber'),
-     toGet = cms.VPSet(
-       cms.PSet(
-           record = cms.string('JetCorrectionsRecord'),
-           tag    = cms.string('JetCorrectorParametersCollection_Jec11V2_AK5PF'),
-           label  = cms.untracked.string('AK5PF')
-       ),
-       cms.PSet(
-           record = cms.string('JetCorrectionsRecord'),
-           tag    = cms.string('JetCorrectorParametersCollection_Jec11V2_AK5Calo'),
-           label  = cms.untracked.string('AK5Calo')
-       )
-    ),
-    connect = cms.string('sqlite_fip:TauAnalysis/Configuration/data/Jec11V2.db')
-)
-process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
 
 #--------------------------------------------------------------------------------
 
@@ -46,7 +22,7 @@ switchJetCollection(process, cms.InputTag('ak5PFJets'),
      doJTA        = True,
      doBTagging   = True,
      jetCorrLabel = ('AK5PF', cms.vstring(jec)),
-     doType1MET   = False,
+     doType1MET   = True,
      genJetCollection=cms.InputTag("ak5GenJets"),
      doJetID      = True,
      jetIdLabel   = 'ak5'
@@ -59,7 +35,7 @@ switchJetCollection(process, cms.InputTag('ak5PFJets'),
 #removeSpecificPATObjects(process, ['Electrons', 'Muons', 'Taus'])
 
 from PhysicsTools.PatAlgos.tools.tauTools import *
-#switchToPFTauHPS(process) # For HPS Taus
+switchToPFTauHPS(process) # For HPS Taus
 #switchToPFTauHPSpTaNC(process) # For HPS TaNC Taus  
 
 #--------------------------------------------------------------------------------
@@ -218,23 +194,23 @@ process.electronVariables = cms.EDProducer('ElectronsUserEmbedder',
 )
 
 process.skimmedElectrons = cms.EDFilter("PATElectronSelector",
-		src = cms.InputTag("electronVariables"),
-		cut = cms.string('pt >= 15. && abs(eta) < 2.5'),
-		filter = cms.bool(True)
-		)
+	src = cms.InputTag("electronVariables"),
+	cut = cms.string('pt >= 15. && abs(eta) < 2.5'),
+	filter = cms.bool(True)
+)
 
 process.skimmedTaus = cms.EDFilter("PATTauSelector",
-		src = cms.InputTag("tauVariables"),
-          	cut = cms.string('pt >= 15. && abs(eta) < 2.5 && tauID("decayModeFinding") > 0.5 && tauID("byTightCombinedIsolationDeltaBetaCorr") > 0.5'),
-		filter = cms.bool(True)
-		)
+	src = cms.InputTag("tauVariables"),
+	cut = cms.string('pt >= 15. && abs(eta) < 2.5 && tauID("decayModeFinding") > 0.5 && tauID("byLooseCombinedIsolationDeltaBetaCorr") > 0.5'),
+	filter = cms.bool(True)
+)
 
 process.numTaus = cms.EDFilter("PATCandViewCountFilter",
-		src = cms.InputTag("skimmedTaus"),
-		maxNumber = cms.uint32(2000),
-		minNumber = cms.uint32(2),
-		filter = cms.bool(True)
-		)
+	src = cms.InputTag("skimmedTaus"),
+	maxNumber = cms.uint32(2000),
+	minNumber = cms.uint32(2),
+	filter = cms.bool(True)
+)
 
 # load the PU JetID sequence
 process.load("CMGTools.External.pujetidsequence_cff")
@@ -246,11 +222,28 @@ process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3
 process.pfMEtMVA.srcLeptons = cms.VInputTag('cleanPatElectrons', 'cleanPatMuons', 'cleanPatTaus')
 
 process.patPFMetByMVA = process.patMETs.clone(
-  		metSource = cms.InputTag('pfMEtMVA'),
-  		addMuonCorrections = cms.bool(False),
-  		addGenMET = cms.bool(False),
-  		genMETSource = cms.InputTag('genMetTrue')
-		)
+	metSource = cms.InputTag('pfMEtMVA'),
+	addMuonCorrections = cms.bool(False),
+	addGenMET = cms.bool(False),
+	genMETSource = cms.InputTag('genMetTrue')
+)
+
+process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+process.pfJetMETcorr.offsetCorrLabel = cms.string("ak5PFL1Fastjet")
+process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
+
+# load the coreTools of PAT
+from PhysicsTools.PatAlgos.tools.metTools import *
+addTcMET(process, 'TC')
+addPfMET(process, 'PF')
+process.patMETsPF.metSource = cms.InputTag("pfMet")
+
+process.patPFMETsTypeIcorrected = process.patMETs.clone(
+	metSource = cms.InputTag('pfType1CorrectedMet'),
+	addMuonCorrections = cms.bool(False),
+	genMETSource = cms.InputTag('genMetTrue'),
+	addGenMET = cms.bool(False)
+)
 
 process.counter = cms.EDAnalyzer('SimpleCounter')
 process.TFileService = cms.Service("TFileService", fileName = cms.string('histo_counter.root'))
@@ -262,6 +255,7 @@ process.p = cms.Path(
 	process.pfParticleSelectionSequence *
 	process.muIsoSequence *
 	process.electronIsoSequence *
+  	process.producePFMETCorrections *
 	process.patDefaultSequence *
 	process.muonVariables *
 	process.electronVariables *
@@ -269,15 +263,12 @@ process.p = cms.Path(
 	process.puJetIdSqeuence *
 	process.pfMEtMVAsequence *
 	process.patPFMetByMVA *
+	process.patPFMETsTypeIcorrected *
 	process.skimmedElectrons *
 	process.skimmedTaus *
 	process.numTaus
-	)
-                       
-# load the coreTools of PAT
-from PhysicsTools.PatAlgos.tools.metTools import *
-addTcMET(process, 'TC')
-addPfMET(process, 'PF')
+)
+                      
 
 ## remove MC matching from the default sequence
 #removeMCMatching(process, ['All'])
@@ -403,7 +394,7 @@ process.source.fileNames = [                    ##
 
    ]                                            ##  (e.g. 'file:AOD.root')
 #                                               ##
-process.maxEvents.input = 100                    ##  (e.g. -1 to run on all events)
+process.maxEvents.input = 500                    ##  (e.g. -1 to run on all events)
 #                                               ##
 process.out.outputCommands = [ #'keep *'
 			       #'keep *_genParticles_*_*',
