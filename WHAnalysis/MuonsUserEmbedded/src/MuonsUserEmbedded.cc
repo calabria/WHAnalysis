@@ -508,8 +508,8 @@ MuonsUserEmbedded::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     vetos2010Photons.push_back(new reco::isodeposit::ConeVeto(reco::isodeposit::Direction(aMuon.eta(),aMuon.phi()),0.05));
     vetos2010Photons.push_back(new reco::isodeposit::ThresholdVeto(1.0));
     
-    vetos2011Charged.push_back(new reco::isodeposit::ConeVeto(reco::isodeposit::Direction(aMuon.eta(),aMuon.phi()),0.01));
-    vetos2011Charged.push_back(new reco::isodeposit::ThresholdVeto(0.5));//it was 0.0
+    vetos2011Charged.push_back(new reco::isodeposit::ConeVeto(reco::isodeposit::Direction(aMuon.eta(),aMuon.phi()),0.0001));
+    vetos2011Charged.push_back(new reco::isodeposit::ThresholdVeto(0.0));
     vetos2011Neutral.push_back(new reco::isodeposit::ConeVeto(reco::isodeposit::Direction(aMuon.eta(),aMuon.phi()),0.01));
     vetos2011Neutral.push_back(new reco::isodeposit::ThresholdVeto(0.5));
     vetos2011Photons.push_back(new reco::isodeposit::ConeVeto(reco::isodeposit::Direction(aMuon.eta(),aMuon.phi()),0.01));
