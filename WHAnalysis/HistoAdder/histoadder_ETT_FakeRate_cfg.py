@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import os
 
 process = cms.Process("ETT")
 
@@ -8,25 +9,27 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 process.source = cms.Source("EmptySource")
 
+CMSSW_BASE = os.environ['CMSSW_BASE']
+
 process.demo = cms.EDAnalyzer('HistoAdder',
 
 	process = cms.untracked.string("ETT"),
 
 	nostack = cms.untracked.bool(False),
 
-        path = cms.untracked.string("/cmshome/calabria/Code_42X_TauIDNov_Indara/CMSSW_4_2_8_patch7/src/WHAnalysis/HistoAdderFirstStep/ETT/"),
+        path = cms.untracked.string(CMSSW_BASE + "/src/WHAnalysis/HistoAdderFirstStep/ETT/"),
 
         samples = cms.untracked.vstring("DiBosonsNoWW.root",
-                                        "histo_TauPlusX_FakeRate.root",
+                                        "histo_data_FR.root",
                                         #"histo_data_FR2.root",
                                         #"DY.root",
                                         #"QCD.root",
 					"WH_125.root",
-				        "TTH_125.root",
-                                        "ZH_125.root",
+				        #"TTH_125.root",
+                                        #"ZH_125.root",
 				       ),
 
-	data = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT_NoMVALooseMedium/histo_data.root"),
+	data = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/histo_data.root"),
         #data = cms.untracked.string(""),
 
         labels = cms.untracked.vstring("WZ+ZZ",
@@ -35,8 +38,8 @@ process.demo = cms.EDAnalyzer('HistoAdder',
 				       #"DY",
 				       #"QCD",
 				       "WH_125",
-                                       "TTH_125",
-				       "ZH_125",
+                                       #"TTH_125",
+				       #"ZH_125",
 				      ),
 
         logScale = cms.untracked.bool(False),
@@ -47,8 +50,8 @@ process.demo = cms.EDAnalyzer('HistoAdder',
                                           #5.,
 					  #38.,
 					  2.,
-					  8.,
-                                          4.,
+					  #8.,
+                                          #4.,
 					 ),
 
 	legendLabels = cms.untracked.vstring("WZ+ZZ",
@@ -59,9 +62,9 @@ process.demo = cms.EDAnalyzer('HistoAdder',
 				  	     #"WH 120 (x5)",
                                              #"t#bar{t}H 120 (x5)",
 				             #"ZH 120 (x5)",
-				  	     "WH 125",
-                                             "t#bar{t}H 125",
-				             "ZH 125",
+				  	     "Signal (125)",
+                                             #"t#bar{t}H 125",
+				             #"ZH 125",
 					    ),
 
         legendDim = cms.untracked.vdouble(0.75, 0.60, 0.9, 0.9),
@@ -70,9 +73,9 @@ process.demo = cms.EDAnalyzer('HistoAdder',
 
         txtFile = cms.untracked.string("./Outputs/ETT/outputTOT_ETT_FR.txt"),
 
-        energy = cms.untracked.string("7 TeV"),
+        energy = cms.untracked.string("8 TeV"),
 
-        lumi = cms.untracked.string("5 fb^{-1}")
+        lumi = cms.untracked.string("19.5 fb^{-1}")
 
 )
 

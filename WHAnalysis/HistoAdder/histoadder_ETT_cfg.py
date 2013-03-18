@@ -14,7 +14,7 @@ process.demo = cms.EDAnalyzer('HistoAdder',
 
 	nostack = cms.untracked.bool(False),
 
-        path = cms.untracked.string("/cmshome/calabria/Code_42X_TauIDNov_Indara/CMSSW_4_2_8_patch7/src/WHAnalysis/HistoAdderFirstStep/ETT/"),
+        path = cms.untracked.string("/cmshome/calabria/Code_53X_TauIdDec2012_OnlyAnalysis/CMSSW_5_3_7_patch4/src/WHAnalysis/HistoAdderFirstStep/ETT/"),
 
         samples = cms.untracked.vstring("DiBosons.root",
                                         "EWK.root",
@@ -26,7 +26,7 @@ process.demo = cms.EDAnalyzer('HistoAdder',
                                         "ZH_125.root",
 				       ),
 
-	data = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/histo_data.root"),
+	data = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/histo_data.root"),
         #data = cms.untracked.string(""),
 
         labels = cms.untracked.vstring("DiBosons",
@@ -52,7 +52,7 @@ process.demo = cms.EDAnalyzer('HistoAdder',
 					 ),
 
 	legendLabels = cms.untracked.vstring("DiBoson",
-                                             "EWK",
+                                             "t#bar{t}",
 					     "WJets",
 				             "Drell-Yan",
 				             #"QCD",
@@ -70,9 +70,9 @@ process.demo = cms.EDAnalyzer('HistoAdder',
 
         txtFile = cms.untracked.string("./Outputs/ETT/outputTOT_ETT.txt"),
 
-        energy = cms.untracked.string("7 TeV"),
+        energy = cms.untracked.string("8 TeV"),
 
-        lumi = cms.untracked.string("5 fb^{-1}")
+        lumi = cms.untracked.string("19.5 fb^{-1}")
 
 )
 
