@@ -207,6 +207,47 @@ HistoAdderFirstStep::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
    if(outputTXT.is_open()){
 
+	  //// Final table No Scale Factor No PU ////
+
+	  outputTXT<<"\n"<<setfill('-')<<setw(100)<<"-"<<std::endl;
+	  outputTXT<<"Final table (No scale factor, No PU)"<<std::endl;
+	  outputTXT<<setfill('-')<<setw(100)<<"-"<<std::endl;
+
+	  outputTXT<<"\n ";
+	  outputTXT<<"Cut ";
+	  for(int i = 0; i < sizeFiles; i++){
+
+		outputTXT<<labels_[i]<<" Err. ";
+
+	  }
+  	  outputTXT<<" "<<std::endl;
+
+	  for(int j = 0; j < numFolders; j++){
+
+		std::string name = dirStructure[j] + "/N_eventi";
+		//std::cout<<"name "<<name.c_str()<<std::endl;
+		outputTXT<<"|"<<dirStructure[j].c_str()<<"|";
+
+	  	for(int i = 0; i < sizeFiles; i++){
+
+			std::string nameAndPath;
+			nameAndPath = path_ + samples_[i];
+			//std::cout<<"sample "<<nameAndPath<<std::endl;
+			TFile * fileIn = TFile::Open(nameAndPath.c_str());
+			fileIn->cd();
+			TH1F *histoTMP = (TH1F*)gDirectory->Get(name.c_str());
+			double numEvents = histoTMP->GetBinContent(2);
+			//std::cout<<"dirStructure "<<dirStructure[j].c_str()<<"events "<<numEvents<<std::endl;
+			double radqEvt = TMath::Sqrt(numEvents);
+			//std::cout<<" "<<fixed<<setprecision(3)<<numEvents*scaleFactor<<" "<<fixed<<setprecision(3)<<scaleFactor*radqEvt;
+			outputTXT<<" "<<fixed<<setprecision(3)<<numEvents<<" "<<fixed<<setprecision(3)<<radqEvt;
+			fileIn->Close();
+		}
+
+		outputTXT<<" "<<std::endl;
+
+	  }
+
 	  //// Final table No Scale Factor ////
 
 	  outputTXT<<"\n"<<setfill('-')<<setw(100)<<"-"<<std::endl;

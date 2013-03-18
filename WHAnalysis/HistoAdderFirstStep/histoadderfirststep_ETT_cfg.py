@@ -8,29 +8,38 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 process.source = cms.Source("EmptySource")
 
-skimWH110      = 0.35944
-skimWH115      = 0.36706
-skimWH120      = 0.40791
-skimWH125      = 0.38837
-skimWH130      = 0.39777
-skimWH135      = 0.40158
-skimDYJetsToLL = 0.23286
-skimDYToEE     = 0.28072
-skimDYToTauTau = 0.05649
-skimWJets      = 0.06624
-skimTTJets     = 0.46048
-skimWW         = 0.19815
-skimWZ         = 0.16757
-skimZZ         = 0.15492
-skimGVJets     = 0.21369
+skimDYJetsToLL  = 0.126528145
+skimDYToEE      = 0.223328684
+skimDYToMuMu    = 0.000727441
+skimDYToTauTau	= 0.009955275
+skimTTJets      = 0.133671782
+skimZZ          = 0.045567673
+skimWW          = 0.062302915
+skimWZ          = 0.048978714
+skimWH110 	= 0.133467726
+skimWH115 	= 0.139618877
+skimWH120 	= 0.145977683
+skimWH125 	= 0.150696568
+skimWH130 	= 0.155027989
+skimWH135 	= 0.161976335
+skimWH140 	= 0.168508287
+skimWH145 	= 0.172274233
+skimWH150 	= 0.176581789
+skimWH155 	= 0.183113422
+skimWH160 	= 0.187240208
+skimWJets_v1	= 0.011164410
+skimWJets_v2	= 0.011169573
+
+
+pathFiles       = "/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"
 
 process.WH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.070), #WH_110
+        crossSections = cms.untracked.vdouble(1.06*0.08), #WH_110
 
 	skimEff = cms.untracked.vdouble(skimWH110),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/WH_110.root"),
 
@@ -38,7 +47,7 @@ process.WH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("WH_110"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -48,11 +57,11 @@ process.WH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.TTH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.010), #TTH_110
+        crossSections = cms.untracked.vdouble(0.1887*0.08), #TTH_110
 
 	skimEff = cms.untracked.vdouble(skimWH110),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/TTH_110.root"),
 
@@ -60,7 +69,7 @@ process.TTH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("TTH_110"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -70,11 +79,11 @@ process.TTH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.ZH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.038), #ZH_110
+        crossSections = cms.untracked.vdouble(0.5869*0.08), #ZH_110
 
 	skimEff = cms.untracked.vdouble(skimWH110),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/ZH_110.root"),
 
@@ -82,7 +91,7 @@ process.ZH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("ZH_110"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -92,11 +101,11 @@ process.ZH_110 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.WH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.058*5), #WH_115
+        crossSections = cms.untracked.vdouble(0.9165*0.0765), #WH_115
 
 	skimEff = cms.untracked.vdouble(skimWH115),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/WH_115.root"),
 
@@ -104,7 +113,7 @@ process.WH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("WH_115"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -114,11 +123,11 @@ process.WH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.TTH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.008*5), #TTH_115
+        crossSections = cms.untracked.vdouble(0.1663*0.0765), #TTH_115
 
 	skimEff = cms.untracked.vdouble(skimWH115),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/TTH_115.root"),
 
@@ -126,7 +135,7 @@ process.TTH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("TTH_115"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -136,11 +145,11 @@ process.TTH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.ZH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.031*5), #ZH_115
+        crossSections = cms.untracked.vdouble(0.5117*0.0765), #ZH_115
 
 	skimEff = cms.untracked.vdouble(skimWH115),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/ZH_115.root"),
 
@@ -148,7 +157,7 @@ process.ZH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("ZH_115"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -158,11 +167,11 @@ process.ZH_115 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.WH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.047), #WH_120
+        crossSections = cms.untracked.vdouble(0.7966*0.0710), #WH_120
 
 	skimEff = cms.untracked.vdouble(skimWH120),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/WH_120.root"),
 
@@ -170,7 +179,7 @@ process.WH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("WH_120"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -180,11 +189,11 @@ process.WH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.TTH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.007), #TTH_120
+        crossSections = cms.untracked.vdouble(0.147*0.0710), #TTH_120
 
 	skimEff = cms.untracked.vdouble(skimWH120),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/TTH_120.root"),
 
@@ -192,7 +201,7 @@ process.TTH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("TTH_120"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -202,11 +211,11 @@ process.TTH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.ZH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.026), #ZH_120
+        crossSections = cms.untracked.vdouble(0.4483*0.0710), #ZH_120
 
 	skimEff = cms.untracked.vdouble(skimWH120),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/ZH_120.root"),
 
@@ -214,7 +223,7 @@ process.ZH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("ZH_120"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -224,11 +233,11 @@ process.ZH_120 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.WH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.5729*0.0637), #WH_125
+        crossSections = cms.untracked.vdouble((0.6966+0.1302+0.3943)*0.0637), #WH_125 #summed together!!!
 
 	skimEff = cms.untracked.vdouble(skimWH125),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/WH_125.root"),
 
@@ -236,7 +245,7 @@ process.WH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("WH_125"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -246,11 +255,11 @@ process.WH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.TTH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.08634*0.0637), #TTH_125
+        crossSections = cms.untracked.vdouble(0.1302*0.0637), #TTH_125
 
 	skimEff = cms.untracked.vdouble(skimWH125),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/TTH_125.root"),
 
@@ -258,7 +267,7 @@ process.TTH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("TTH_125"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -268,11 +277,11 @@ process.TTH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.ZH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.3158*0.0637), #ZH_125
+        crossSections = cms.untracked.vdouble(0.3943*0.0637), #ZH_125
 
 	skimEff = cms.untracked.vdouble(skimWH125),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/ZH_125.root"),
 
@@ -280,7 +289,7 @@ process.ZH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("ZH_125"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -290,11 +299,11 @@ process.ZH_125 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.WH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.027), #WH_130
+        crossSections = cms.untracked.vdouble(0.6095*0.0548), #WH_130
 
 	skimEff = cms.untracked.vdouble(skimWH130),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/WH_130.root"),
 
@@ -302,7 +311,7 @@ process.WH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("WH_130"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -312,11 +321,11 @@ process.WH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.TTH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.004), #TTH_130
+        crossSections = cms.untracked.vdouble(0.1157*0.0548), #TTH_130
 
 	skimEff = cms.untracked.vdouble(skimWH130),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/TTH_130.root"),
 
@@ -324,7 +333,7 @@ process.TTH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("TTH_130"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -334,11 +343,11 @@ process.TTH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.ZH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.015), #ZH_130
+        crossSections = cms.untracked.vdouble(0.3473*0.0548), #ZH_130
 
 	skimEff = cms.untracked.vdouble(skimWH130),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/ZH_130.root"),
 
@@ -346,7 +355,7 @@ process.ZH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("ZH_130"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -356,11 +365,11 @@ process.ZH_130 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.WH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.020), #WH_135
+        crossSections = cms.untracked.vdouble(0.5351*0.0452), #WH_135
 
 	skimEff = cms.untracked.vdouble(skimWH135),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/WH_135.root"),
 
@@ -368,7 +377,7 @@ process.WH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("WH_135"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -378,11 +387,11 @@ process.WH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.TTH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.003), #TTH_135
+        crossSections = cms.untracked.vdouble(0.1031*0.0452), #TTH_135
 
 	skimEff = cms.untracked.vdouble(skimWH135),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/TTH_135.root"),
 
@@ -390,7 +399,7 @@ process.TTH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("TTH_135"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -400,11 +409,11 @@ process.TTH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.ZH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(0.011), #ZH_135
+        crossSections = cms.untracked.vdouble(0.3074*0.0452), #ZH_135
 
 	skimEff = cms.untracked.vdouble(skimWH135),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/ZH_135.root"),
 
@@ -412,7 +421,7 @@ process.ZH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("ZH_135"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -420,17 +429,149 @@ process.ZH_135 = cms.EDAnalyzer('HistoAdderFirstStep',
 
 )
 
+process.WH_140 = cms.EDAnalyzer('HistoAdderFirstStep',
+
+        crossSections = cms.untracked.vdouble(0.4713*0.0354), #WH_140
+
+	skimEff = cms.untracked.vdouble(skimWH135),
+
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
+
+        outputFile = cms.untracked.string("./ETT/WH_140.root"),
+
+        samples = cms.untracked.vstring("histo_WH_140.root"),
+
+        labels = cms.untracked.vstring("WH_140"),
+
+        intLumi = cms.untracked.double(19490.611),
+
+        eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
+
+        txtFile = cms.untracked.string("./ETT/output_WH_140.txt")
+
+)
+
+process.TTH_140 = cms.EDAnalyzer('HistoAdderFirstStep',
+
+        crossSections = cms.untracked.vdouble(0.09207*0.0354), #TTH_140
+
+	skimEff = cms.untracked.vdouble(skimWH135),
+
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
+
+        outputFile = cms.untracked.string("./ETT/TTH_140.root"),
+
+        samples = cms.untracked.vstring("histo_TTH_140.root"),
+
+        labels = cms.untracked.vstring("TTH_140"),
+
+        intLumi = cms.untracked.double(19490.611),
+
+        eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
+
+        txtFile = cms.untracked.string("./ETT/output_TTH_140.txt")
+
+)
+
+process.ZH_140 = cms.EDAnalyzer('HistoAdderFirstStep',
+
+        crossSections = cms.untracked.vdouble(0.2728*0.0354), #ZH_140
+
+	skimEff = cms.untracked.vdouble(skimWH135),
+
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
+
+        outputFile = cms.untracked.string("./ETT/ZH_140.root"),
+
+        samples = cms.untracked.vstring("histo_ZH_140.root"),
+
+        labels = cms.untracked.vstring("ZH_140"),
+
+        intLumi = cms.untracked.double(19490.611),
+
+        eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
+
+        txtFile = cms.untracked.string("./ETT/output_ZH_140.txt")
+
+)
+
+process.WH_145 = cms.EDAnalyzer('HistoAdderFirstStep',
+
+        crossSections = cms.untracked.vdouble(0.4164*0.0261), #WH_145
+
+	skimEff = cms.untracked.vdouble(skimWH135),
+
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
+
+        outputFile = cms.untracked.string("./ETT/WH_145.root"),
+
+        samples = cms.untracked.vstring("histo_WH_145.root"),
+
+        labels = cms.untracked.vstring("WH_145"),
+
+        intLumi = cms.untracked.double(19490.611),
+
+        eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
+
+        txtFile = cms.untracked.string("./ETT/output_WH_145.txt")
+
+)
+
+process.TTH_145 = cms.EDAnalyzer('HistoAdderFirstStep',
+
+        crossSections = cms.untracked.vdouble(0.08246*0.0261), #TTH_145
+
+	skimEff = cms.untracked.vdouble(skimWH135),
+
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
+
+        outputFile = cms.untracked.string("./ETT/TTH_145.root"),
+
+        samples = cms.untracked.vstring("histo_TTH_145.root"),
+
+        labels = cms.untracked.vstring("TTH_145"),
+
+        intLumi = cms.untracked.double(19490.611),
+
+        eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
+
+        txtFile = cms.untracked.string("./ETT/output_TTH_145.txt")
+
+)
+
+process.ZH_145 = cms.EDAnalyzer('HistoAdderFirstStep',
+
+        crossSections = cms.untracked.vdouble(0.2424*0.0261), #ZH_145
+
+	skimEff = cms.untracked.vdouble(skimWH135),
+
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
+
+        outputFile = cms.untracked.string("./ETT/ZH_145.root"),
+
+        samples = cms.untracked.vstring("histo_ZH_145.root"),
+
+        labels = cms.untracked.vstring("ZH_145"),
+
+        intLumi = cms.untracked.double(19490.611),
+
+        eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
+
+        txtFile = cms.untracked.string("./ETT/output_ZH_145.txt")
+
+)
+
 process.DiBosons = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(5.9,  #ZZ
-                                              18.2, #WZ
-                                              43.), #WW
+        crossSections = cms.untracked.vdouble(8.297,  #ZZ
+                                              33.85, #WZ
+                                              56.7532), #WW
 
 	skimEff = cms.untracked.vdouble(skimZZ,
 					skimWZ,
 					skimWW),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/DiBosons.root"),
 
@@ -442,7 +583,7 @@ process.DiBosons = cms.EDAnalyzer('HistoAdderFirstStep',
                                        "WZ",
 				       "WW"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -452,13 +593,13 @@ process.DiBosons = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.DiBosonsNoWW = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(5.9,  #ZZ
-                                              18.2), #WZ
+        crossSections = cms.untracked.vdouble(8.297,  #ZZ
+                                              33.85), #WZ
 
 	skimEff = cms.untracked.vdouble(skimZZ,
 					skimWZ),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/DiBosonsNoWW.root"),
 
@@ -468,7 +609,7 @@ process.DiBosonsNoWW = cms.EDAnalyzer('HistoAdderFirstStep',
         labels = cms.untracked.vstring("ZZ",
                                        "WZ"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -478,11 +619,11 @@ process.DiBosonsNoWW = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.DY = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(3048.),
+        crossSections = cms.untracked.vdouble(3503.71),
 
 	skimEff = cms.untracked.vdouble(skimDYJetsToLL),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/DY.root"),
 
@@ -490,7 +631,7 @@ process.DY = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("DYJetsToLL"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -500,11 +641,11 @@ process.DY = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.DYToEE = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(1666.),
+        crossSections = cms.untracked.vdouble(1915.083),
 
 	skimEff = cms.untracked.vdouble(skimDYToEE),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/DYToEE.root"),
 
@@ -512,7 +653,7 @@ process.DYToEE = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("DYToEE"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -520,13 +661,35 @@ process.DYToEE = cms.EDAnalyzer('HistoAdderFirstStep',
 
 )
 
+process.DYToMuMu = cms.EDAnalyzer('HistoAdderFirstStep',
+
+        crossSections = cms.untracked.vdouble(1915.083),
+
+	skimEff = cms.untracked.vdouble(skimDYToMuMu),
+
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
+
+        outputFile = cms.untracked.string("./ETT/DYToMuMu.root"),
+
+        samples = cms.untracked.vstring("histo_DYToMuMu.root"),
+
+        labels = cms.untracked.vstring("DYToMuMu"),
+
+        intLumi = cms.untracked.double(19490.611),
+
+        eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
+
+        txtFile = cms.untracked.string("./ETT/output_DYToMuMu.txt")
+
+)
+
 process.DYToTauTau = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(1666.),
+        crossSections = cms.untracked.vdouble(1915.083),
 
 	skimEff = cms.untracked.vdouble(skimDYToTauTau),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/DYToTauTau.root"),
 
@@ -534,7 +697,7 @@ process.DYToTauTau = cms.EDAnalyzer('HistoAdderFirstStep',
 
         labels = cms.untracked.vstring("DYToTauTau"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -558,7 +721,7 @@ process.QCD = cms.EDAnalyzer('HistoAdderFirstStep',
 					0.70311,
 					0.29857),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/QCD.root"),
 
@@ -576,7 +739,7 @@ process.QCD = cms.EDAnalyzer('HistoAdderFirstStep',
 				       "QCD80_170_BCToE",
 				       "QCD80_170_EM"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -586,31 +749,31 @@ process.QCD = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.EWK = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(56.64,        #GV
-                                              165.,         #TT
+        crossSections = cms.untracked.vdouble(#56.64,        #GV
+                                              234.,         #TT
 					      #31314.
 					     ),      #WJets
 
-	skimEff = cms.untracked.vdouble(skimGVJets,
+	skimEff = cms.untracked.vdouble(#skimGVJets,
 				        skimTTJets
 				        #0.22428
 				       ),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/EWK.root"),
 
-        samples = cms.untracked.vstring("histo_GVJets.root",
+        samples = cms.untracked.vstring(#"histo_GVJets.root",
                                         "histo_TTJets.root",
 					#"histo_WJets.root"
 				       ),
 
-        labels = cms.untracked.vstring("gammaV+jets",
+        labels = cms.untracked.vstring(#"gammaV+jets",
                                        "ttbar+jets",
 				       #"W+jets"
 				      ),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -620,19 +783,19 @@ process.EWK = cms.EDAnalyzer('HistoAdderFirstStep',
 
 process.WJets = cms.EDAnalyzer('HistoAdderFirstStep',
 
-        crossSections = cms.untracked.vdouble(31314.),      #WJets
+        crossSections = cms.untracked.vdouble(37509.0,37509.0),      #WJets
 
-	skimEff = cms.untracked.vdouble(skimWJets),
+	skimEff = cms.untracked.vdouble(skimWJets_v1,skimWJets_v2),
 
-        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_Indara/ETT/"),
+        path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"),
 
         outputFile = cms.untracked.string("./ETT/WJets.root"),
 
-        samples = cms.untracked.vstring("histo_WJets.root"),
+        samples = cms.untracked.vstring("histo_WJets_v1.root", "histo_WJets_v2.root"),
 
-        labels = cms.untracked.vstring("W+jets"),
+        labels = cms.untracked.vstring("W+jets_v1","W+jets_v2"),
 
-        intLumi = cms.untracked.double(5000.),
+        intLumi = cms.untracked.double(19490.611),
 
         eventsIn = cms.untracked.string("VertexHistosBeforeMCFilter2/N_eventi_PU"),
 
@@ -640,13 +803,13 @@ process.WJets = cms.EDAnalyzer('HistoAdderFirstStep',
 
 )
 
-process.p = cms.Path(process.DiBosons + 
-		     process.DiBosonsNoWW +
-		     process.DY + process.DYToEE + process.DYToTauTau +
-		     process.QCD + 
-		     process.EWK + 
-		     process.WJets +
-		     process.WH_110 + process.WH_115 + process.WH_120 + process.WH_125 + process.WH_130 + process.WH_135 +
-		     process.TTH_110 + process.TTH_115 + process.TTH_120 + process.TTH_125 + process.TTH_130 + process.TTH_135 +
-		     process.ZH_110 + process.ZH_115 + process.ZH_120 + process.ZH_125 + process.ZH_130 + process.ZH_135
-		     )
+process.p = cms.Path(
+	#process.DiBosons + 
+	process.DiBosonsNoWW +
+	#process.DY + process.DYToEE + process.DYToMuMu + process.DYToTauTau +
+	#process.EWK + 
+	#process.WJets +
+	process.WH_110 + process.WH_115 + process.WH_120 + process.WH_125 + process.WH_130 + process.WH_135 + process.WH_140 + process.WH_145 
+	#process.TTH_110 + process.TTH_115 + process.TTH_120 + process.TTH_125 + process.TTH_130 + process.TTH_135 + process.TTH_140 + process.TTH_145 +
+	#process.ZH_110 + process.ZH_115 + process.ZH_120 + process.ZH_125 + process.ZH_130 + process.ZH_135 + process.ZH_140 + process.ZH_145
+	)
