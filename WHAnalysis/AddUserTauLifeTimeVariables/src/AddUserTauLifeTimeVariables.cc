@@ -210,7 +210,11 @@ AddUserTauLifeTimeVariables::produce(edm::Event& iEvent, const edm::EventSetup& 
 
    pat::Tau patTau( (*taus)[i] );
 
-   const reco::PFCandidateRefVector& signalPFChargedHadrCandidates =patTau.signalPFChargedHadrCands();
+   //if (patTau.pfJetRef().isAvailable() && patTau.pfJetRef().isNonnull()) std::cout<<"pfJet: "<<patTau.pfJetRef()->pt()<<std::endl;
+   //if (patTau.pfJetRef().isAvailable() && patTau.pfJetRef().isNonnull()) std::cout<<"pfJet: "<<patTau.pfJetRef()->phi()<<std::endl;
+   //if (patTau.pfJetRef().isAvailable() && patTau.pfJetRef().isNonnull()) std::cout<<"pfJet: "<<patTau.pfJetRef()->eta()<<std::endl;
+
+   const reco::PFCandidateRefVector& signalPFChargedHadrCandidates = patTau.signalPFChargedHadrCands();
 
    float SecVtx_x = 0, SecVtx_y = 0, SecVtx_z = 0;
    float PV_x = 0, PV_y = 0, PV_z = 0;
@@ -336,7 +340,7 @@ AddUserTauLifeTimeVariables::produce(edm::Event& iEvent, const edm::EventSetup& 
 		 
            	}
 	    
-	    std::cout<<" puntatore  traccia "<<ftrk_tmp0<<"  =  "<<&trk_tmp0<<"  pt   "<<(*svTracks[0]).pt()<<std::endl;
+	    //std::cout<<" puntatore  traccia "<<ftrk_tmp0<<"  =  "<<&trk_tmp0<<"  pt   "<<(*svTracks[0]).pt()<<std::endl;
 
 	    int idx=0;
 	     for ( std::vector<reco::Track*>::const_iterator svTrack = svTracks.begin();  svTrack != svTracks.end(); ++svTrack ) {
@@ -429,7 +433,7 @@ AddUserTauLifeTimeVariables::produce(edm::Event& iEvent, const edm::EventSetup& 
 
     tausUserEmbeddedColl->push_back(patTau);
 
-  }
+  }//Qui finisce il loop sui tau
 
   iEvent.put( tausUserEmbeddedColl );
  

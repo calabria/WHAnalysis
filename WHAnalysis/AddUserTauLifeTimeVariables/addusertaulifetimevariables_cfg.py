@@ -1,18 +1,22 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("OWNPARTICLES")
+process = cms.Process("CazziEMazzi")
 
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 #process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 
+process.load("VHTauTau.TreeMaker.TreeCreator_cfi")
+process.load("VHTauTau.TreeMaker.TreeWriter_cfi")
+process.load("VHTauTau.TreeMaker.TreeContentConfig_cff")
+
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = cms.string("START53_V11::All")
+process.GlobalTag.globaltag = cms.string("START53_V16::All")
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 
@@ -20,121 +24,157 @@ process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_100_1_NQH.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_101_1_ECF.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_102_1_Wyc.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_103_2_Scl.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_104_1_Bh4.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_105_1_pnt.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_106_1_xTC.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_107_1_Gry.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_108_1_j4z.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_109_1_ruT.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_10_1_lAG.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_110_1_MwY.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_111_1_vfx.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_112_1_lzV.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_113_1_bVM.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_114_1_9Am.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_115_1_LXb.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_116_1_5WC.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_117_1_pTr.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_119_1_oMq.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_11_1_bwl.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_120_1_iF8.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_121_1_lUm.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_123_1_Obt.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_124_1_6BK.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_126_1_C6R.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_127_1_j13.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_128_1_vnJ.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_129_1_8Qh.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_12_1_QBf.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_130_1_Tnf.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_131_1_W82.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_132_1_l16.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_133_1_pQp.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_134_1_SAT.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_135_1_Tug.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_136_2_kfX.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_137_2_DFc.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_138_2_upA.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_139_2_Kc8.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_13_1_rPN.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_140_2_4PV.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_141_2_cFm.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_142_2_CJE.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_143_2_pCX.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_144_2_GUy.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_145_2_9Ty.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_146_2_1FI.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_147_2_AzW.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_149_2_6AV.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_14_1_lSr.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_150_2_JN5.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_151_2_I9R.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_152_2_GW6.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_153_2_jWq.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_154_2_qyb.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_155_2_GKC.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_156_2_mDR.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_157_2_YJA.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_158_2_fXR.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_159_2_30d.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_15_1_UeO.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_160_2_Qtx.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_161_2_DR9.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_162_2_gwm.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_163_2_BMe.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_164_2_KDa.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_165_2_IP2.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_166_2_qxX.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_167_2_96D.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_168_2_etR.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_169_2_Kcf.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_16_1_wg1.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_170_2_vCi.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_171_2_Seh.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_172_2_dTj.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_173_2_u0u.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_174_2_hAj.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_175_2_DLv.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_176_2_wzk.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_177_2_Ag5.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_178_2_PIf.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_179_2_sm7.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_17_1_F0t.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_180_2_Zuq.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_181_2_hhh.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_182_2_1WI.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_183_2_48r.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_184_2_klk.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_185_2_jpe.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_186_2_Ewk.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_187_2_FkS.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_188_2_HSC.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_189_2_fNz.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_18_1_SWz.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_190_2_NIr.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_191_2_xQb.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_192_2_nmn.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_193_2_83j.root', 
-	'file:/lustre/cms/store/user/rosma/TauLife_53X/DYTauTau/patTuple_194_2_7BZ.root', 
-
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_34_1_nHK.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_35_1_Piz.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_36_1_Fwf.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_37_1_Bwt.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_38_1_zib.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_39_1_yrj.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_3_1_bqm.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_40_1_KaR.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_41_1_qJF.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_42_1_S20.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_43_1_gdQ.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_44_1_Ly4.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_45_1_JmZ.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_46_1_N4I.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_47_1_TqY.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_48_1_KY0.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_49_1_IEk.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_4_1_OEU.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_50_1_dVO.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_51_1_DiL.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_52_1_r9T.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_53_1_Wzu.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_54_1_8Qd.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_55_1_dKP.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_56_1_Eue.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_57_1_rvI.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_58_1_8Y7.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_59_1_eiJ.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_5_1_16q.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_60_1_9cq.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_61_1_bir.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_62_1_11n.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_63_1_6dH.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_64_1_3bG.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_65_1_dV8.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_66_1_3J1.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_67_1_Nwc.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_68_1_FfB.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_69_1_zZh.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_6_1_l8H.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_70_1_NW2.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_71_1_M9h.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_72_1_bbW.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_73_1_7Rv.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_74_1_y4q.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_75_1_XCz.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_76_1_SPo.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_77_1_6x5.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_78_1_ldl.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_79_1_jlY.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_7_1_lOO.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_80_1_hgp.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_81_1_qYl.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_82_1_stV.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_83_1_18X.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_84_1_FTp.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_85_1_dUo.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_86_1_74H.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_87_1_Y1r.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_88_1_daq.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_89_1_Qza.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_8_1_7wc.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_90_1_vy1.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_91_1_IMt.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_92_1_KKu.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_93_1_dxx.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_94_1_iOc.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_95_1_fKx.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_96_1_Nmy.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_97_1_CTA.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_98_1_Q8w.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_99_1_HEL.root',
+'file:/lustre/cms/store/user/rosma/TauLife_537/DYTauTau/patTuple_9_1_oaf.root',
 
     )
 )
 
-
-process.tauLifeVars = cms.EDProducer('AddUserTauLifeTimeVariables',
-    tauSrc = cms.untracked.InputTag("skimmedTaus"),
-    muonSrc = cms.untracked.InputTag("skimmedMuons"),
-    vertexSrc = cms.untracked.InputTag("selectedPrimaryVertices"),
-    srcBeamSpot= cms.untracked.InputTag("offlineBeamSpot")
-
+process.selectedMuonsPt = cms.EDFilter("PATMuonSelector",
+	src = cms.InputTag("skimmedMuons"),
+	cut = cms.string("pt > 24. && userFloat('PFRelIsoDB04v2') < 0.1 && abs(eta) < 2.1"),
+	filter = cms.bool(True)
 )
 
-process.prova = cms.EDProducer("CandViewNtpProducer", 
+process.selectedMuonsForVeto = cms.EDFilter("PATMuonSelector",
+	src = cms.InputTag("muonVariables"),
+	cut = cms.string('pt > 5.'),
+	filter = cms.bool(False)
+	)
+
+process.NoExtraMuons= cms.EDFilter("PATCandViewCountFilter",
+	src = cms.InputTag("selectedMuonsForVeto"),
+	maxNumber = cms.uint32(1),
+	minNumber = cms.uint32(1),
+	filter = cms.bool(True)
+	)
+
+process.selectedTausPt = cms.EDFilter("PATTauSelector",
+	src = cms.InputTag("skimmedTaus"),
+	cut = cms.string('pt > 20.0 && abs(eta) < 2.3'),
+	filter = cms.bool(True)
+)
+
+process.NoExtraTaus = cms.EDFilter("PATCandViewCountFilter",
+	src = cms.InputTag("selectedTausPt"),
+	maxNumber = cms.uint32(1),
+	minNumber = cms.uint32(1),
+	filter = cms.bool(True)
+)
+
+process.tauLifeVars = cms.EDProducer('AddUserTauLifeTimeVariables',
+	tauSrc = cms.untracked.InputTag("selectedTausPt"),
+	muonSrc = cms.untracked.InputTag("selectedMuonsPt"),
+	vertexSrc = cms.untracked.InputTag("selectedPrimaryVertices"),
+	srcBeamSpot= cms.untracked.InputTag("offlineBeamSpot")
+)
+
+selLongDist = "(abs(daughter('mu').vz - daughter('tau').vz) < 0.14)"
+
+process.selectedMuTauPairs = cms.EDProducer("DeltaRMinCandCombiner",
+	decay = cms.string('selectedTausPt selectedMuonsPt'),
+	cut = cms.string(selLongDist),
+	roles = cms.vstring('tau', 'mu'), 
+	deltaRMin = cms.double(0.3),
+	checkCharge = cms.bool(False))
+
+process.selectedMuTauPairsByChargeOS = cms.EDFilter('ChargeFilter',
+	DiTauTag = cms.untracked.InputTag('selectedMuTauPairs'),
+	ChargeCut = cms.untracked.int32(0),
+	filter = cms.bool(True)
+	)
+
+process.selectedPairsByMTOS = cms.EDFilter('MtFilter',
+	DiTauTag = cms.untracked.InputTag('selectedMuTauPairsByChargeOS:selectedCand1Cand2PairsByCharge'),
+	PFMetTag = cms.untracked.InputTag('patPFMETsTypeIcorrected'),
+	MTCut = cms.untracked.double(40),
+	particle = cms.untracked.int32(1),
+	invertCut = cms.untracked.bool(False),
+	filter = cms.bool(True)
+)
+
+process.selectedPairsByPZetaOS = cms.EDFilter('PzetaFilter',
+	DiTauTag = cms.untracked.InputTag('selectedPairsByMTOS:selectedCand1Cand2PairsMT2'),
+	PFMetTag = cms.untracked.InputTag('patPFMETsTypeIcorrected'),
+	PzetaCut = cms.untracked.double(-20),
+ 	#particle = cms.untracked.int32(1),
+	CoeffPzeta = cms.untracked.double(1.0),
+	CoeffPzetaVis = cms.untracked.double(-1.5),
+	filter = cms.bool(True)
+)
+
+process.prova = cms.EDProducer("CandViewNtpProducer",
     src = cms.InputTag("tauLifeVars"),
     lazyParser = cms.untracked.bool(True),
     prefix = cms.untracked.string("TauLife"),
@@ -151,28 +191,47 @@ process.prova = cms.EDProducer("CandViewNtpProducer",
     cms.PSet(
     tag = cms.untracked.string("Phi"),
     quantity = cms.untracked.string("phi")
-    ), 
+    ),
     cms.PSet(
     tag = cms.untracked.string("IPxySigLead"),
     quantity = cms.untracked.string("userFloat('IPxySigLead')")
-    ), 
+    ),
     cms.PSet(
     tag = cms.untracked.string("distSVPVRef"),
     quantity = cms.untracked.string("userFloat('distSV_PVRef')")
-    ), 
-  )  
+    ),
+  )
  )
 
-
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('myOutputFile.root'),
-    outputCommands = cms.untracked.vstring(
-      "drop *",
-      "keep *_prova_*_*",
+	fileName = cms.untracked.string('myOutputFile.root'),
+	outputCommands = cms.untracked.vstring(
+		"keep *",
+		"keep *_prova_*_*",
     ),
 )
 
-  
-process.p = cms.Path(process.tauLifeVars * process.prova)
+process.TFileService = cms.Service("TFileService", fileName = cms.string("histoOS3.root") )  
 
-process.e = cms.EndPath(process.out)
+process.DitauSequenceForOS = cms.Sequence(
+	process.selectedMuTauPairsByChargeOS*
+	process.selectedPairsByMTOS *
+	process.selectedPairsByPZetaOS
+	)
+
+process.p = cms.Path(
+	process.selectedMuonsPt *
+	process.selectedTausPt *
+	process.selectedMuTauPairs *
+	process.DitauSequenceForOS *
+        process.selectedMuonsForVeto *
+	process.NoExtraMuons *
+	process.NoExtraTaus *
+	#process.tauLifeVars *
+	#process.prova
+	process.treeCreator *
+	process.treeContentSequence *
+	process.treeWriter 
+)
+
+#process.e = cms.EndPath(process.out)
