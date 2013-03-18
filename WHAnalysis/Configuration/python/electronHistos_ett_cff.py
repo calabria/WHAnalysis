@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 from weights_cff import *
 
 EleHistosBeforeMCMatcher = cms.EDAnalyzer("ElectronHistManager",
-  electronSrc = cms.untracked.InputTag("producesUserDefinedVarsEle"),
+  electronSrc = cms.untracked.InputTag("electronVariables"),
   muonSrc  = cms.untracked.InputTag("muonVariables"),                                     
   vertexSrc = cms.untracked.InputTag("offlinePrimaryVerticesWithBS"),
   MCDist = cms.untracked.vdouble(vecMC),
@@ -11,7 +11,7 @@ EleHistosBeforeMCMatcher = cms.EDAnalyzer("ElectronHistManager",
 )
 
 EleHistosBeforeDeltaR = cms.EDAnalyzer("ElectronHistManager",
-  electronSrc = cms.untracked.InputTag("producesUserDefinedVarsEle"),
+  electronSrc = cms.untracked.InputTag("electronVariables"),
   muonSrc  = cms.untracked.InputTag("muonVariables"),                                     
   vertexSrc = cms.untracked.InputTag("offlinePrimaryVerticesWithBS"),
   MCDist = cms.untracked.vdouble(vecMC),
@@ -20,7 +20,7 @@ EleHistosBeforeDeltaR = cms.EDAnalyzer("ElectronHistManager",
 )
 
 EleHistosBeforeElePt = cms.EDAnalyzer("ElectronHistManager",
-  electronSrc = cms.untracked.InputTag("producesUserDefinedVarsEle"),
+  electronSrc = cms.untracked.InputTag("electronVariables"),
   muonSrc  = cms.untracked.InputTag("muonVariables"),
   vertexSrc = cms.untracked.InputTag("offlinePrimaryVerticesWithBS"),
   MCDist = cms.untracked.vdouble(vecMC),

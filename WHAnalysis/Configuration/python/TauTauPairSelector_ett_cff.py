@@ -35,19 +35,41 @@ TauTauSequence = cms.Sequence(
 			DiTauHistosFinalForTauTau 
 			)
 
-selectedCompCandUW = cms.EDFilter("CompositeCandFilter",
-       			CompCandSrc = cms.untracked.InputTag("selectedEleTau1Tau2Cand"),
-			EtCut = cms.untracked.double(0),
-			applyEMuCharge = cms.untracked.bool(False), #Charge (mu1,mu2)
-        		filter = cms.bool(False)
-			)
-
 ztautauVeto = cms.EDFilter('ZTauTauVeto',
        			CompCandSrc = cms.untracked.InputTag("selectedEleTau1Tau2Cand"),
-        		PFMetTag = cms.untracked.InputTag('patMETsPF'),
+        		#PFMetTag = cms.untracked.InputTag('patMETsPF'),
+        		PFMetTag = cms.untracked.InputTag('patPFMetByMVA'),
 			cosCut1 = cms.untracked.double(-0.5),
 			mtCut1 = cms.untracked.double(50),
 			cosCut2 = cms.untracked.double(-0.5),
 			mtCut2 = cms.untracked.double(50),
         		filter = cms.bool(True)
 			)
+
+selectedCompCandUW = cms.EDFilter("CompositeCandFilter",
+       			CompCandSrc = cms.untracked.InputTag("ztautauVeto"),
+			EtCut = cms.untracked.double(0),
+			applyEMuCharge = cms.untracked.bool(False), #Charge (mu1,mu2)
+        		filter = cms.bool(False)
+			)
+
+selectedCompCandNearZ = cms.EDFilter("ZEleTauVeto",
+       			CompCandSrc = cms.untracked.InputTag("selectedEleTau1Tau2Cand"),
+			cut = cms.untracked.double(6),
+        		filter = cms.bool(True)
+			)
+
+#selectedNoEleTauPair = cms.EDFilter("PATCandViewCountFilter",
+#                     	src = cms.InputTag("selectedCompCandNearZ"),
+#                     	maxNumber = cms.uint32(0),
+#                     	minNumber = cms.uint32(0),
+#                        filter = cms.bool(True)
+#			)
+
+selectedNoEleTauMatch = cms.EDFilter("PATCandViewCountFilter",
+                     	src = cms.InputTag("selectedEleTau1Tau2CandZeeStep4"),
+                     	maxNumber = cms.uint32(0),
+                     	minNumber = cms.uint32(0),
+                        filter = cms.bool(True)
+			)
+

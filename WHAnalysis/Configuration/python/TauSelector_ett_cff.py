@@ -1,10 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 from tauHistos_ett_cff import *
 
+tau1Matching = cms.EDFilter("PATTauSelector",
+                         src = cms.InputTag("producesUserDefinedVarsTau"),
+                         cut = cms.string("userInt('mcMatch') > 0.5"),
+                         filter = cms.bool(True)
+                         )
+
 selectedTausByDeltaR = cms.EDProducer("EleEleSelTauByDeltaR",
-     			tauSrc = cms.untracked.InputTag("producesUserDefinedVarsTau"),
-     			lep1Src = cms.untracked.InputTag("selectedElectronsWP95"),
-     			lep2Src = cms.untracked.InputTag("selectedElectronsWP95"),                             
+     			tauSrc = cms.untracked.InputTag("tauVariables"),
+     			lep1Src = cms.untracked.InputTag("selectedElectronsAdditional"),
+     			lep2Src = cms.untracked.InputTag("selectedElectronsAdditional"),                             
      			DeltaRCut = cms.untracked.double(0.5)
 			)
 
@@ -18,18 +24,18 @@ leadSubLeadTaus = cms.EDProducer('LeadTausProducer',
     			 lepSrc = cms.untracked.InputTag("selectedTausByDeltaR:TauSelByDeltaR"),                                                               
 			 )
 
-################################ TAU1 ################################ 
+################################ TAU1 ################################
 
 selectedTausPt1 = cms.EDFilter("PATTauSelector",
                          src = cms.InputTag("selectedTausByDeltaR:TauSelByDeltaR"),
-                         cut = cms.string('pt > 25.0'),
+                         cut = cms.string('pt > 45.0'),
                          filter = cms.bool(True)
                          )
 
 selectedTausEta = cms.EDFilter("PATTauSelector",
                          src = cms.InputTag("selectedTausPt1"),
-                         #cut = cms.string('abs(eta) < 2.5 && !(1.4442 < abs(eta) < 1.566)'),
-                         cut = cms.string("abs(eta) < 2.3 && abs(userFloat('dzWrtPV')) < 0.2"),
+                         cut = cms.string('abs(eta) < 2.3'),
+                         #cut = cms.string("abs(eta) < 2.3 && abs(userFloat('dzWrtPV')) < 0.2"),
                          filter = cms.bool(True)
                          )
 
@@ -53,8 +59,9 @@ selectedTausMuonVeto = cms.EDFilter("PATTauSelector",
 
 selectedTausEleVeto = cms.EDFilter("PATTauSelector",
                          src = cms.InputTag("selectedTausMuonVeto"),
-                         cut = cms.string('tauID("againstElectronMVA") > 0.5'),
+                         #cut = cms.string('tauID("againstElectronMVA") > 0.5'),
                          #cut = cms.string('tauID("againstElectronLoose") > 0.5'),
+                         cut = cms.string('tauID("againstElectronTight") > 0.5'),
                          filter = cms.bool(True)
                         )
 
@@ -79,7 +86,7 @@ skimmedPairsDeltaRPre2 = cms.EDFilter('DeltaRFilter',
 
 selectedTausPt2 = cms.EDFilter("PATTauSelector",
                          src = cms.InputTag("selectedTausByDeltaR:TauSelByDeltaR"),
-                         cut = cms.string('pt > 20.0'),
+                         cut = cms.string('pt > 30.0'),
                          filter = cms.bool(True)
                          )
 
@@ -100,8 +107,8 @@ skimmedPairsDeltaRPt2 = cms.EDFilter('DeltaRFilter',
 
 selectedTausEta2 = cms.EDFilter("PATTauSelector",
                          src = cms.InputTag("selectedTausPt2"),
-                         #cut = cms.string('abs(eta) < 2.5 && !(1.4442 < abs(eta) < 1.566)'),
-                         cut = cms.string("abs(eta) < 2.3 && abs(userFloat('dzWrtPV')) < 0.2"),
+                         cut = cms.string('abs(eta) < 2.3'),
+                         #cut = cms.string("abs(eta) < 2.3 && abs(userFloat('dzWrtPV')) < 0.2"),
                          filter = cms.bool(True)
                          )
 
@@ -185,8 +192,8 @@ skimmedPairsDeltaRMuVeto2 = cms.EDFilter('DeltaRFilter',
 
 selectedTausEleVeto2 = cms.EDFilter("PATTauSelector",
                          src = cms.InputTag("selectedTausMuonVeto2"),
-                         cut = cms.string('tauID("againstElectronMVA") > 0.5'),
-                         #cut = cms.string('tauID("againstElectronMedium") > 0.5'),
+                         #cut = cms.string('tauID("againstElectronMVA") > 0.5'),
+                         cut = cms.string('tauID("againstElectronMedium") > 0.5'),
                          filter = cms.bool(True)
                         )
 
@@ -214,13 +221,36 @@ skimmedPairsDeltaREleVeto2 = cms.EDFilter('DeltaRFilter',
 #    			tauSrc = cms.untracked.InputTag("subtractTaus")
 #  			)
 
-tauSequence = cms.Sequence(TauHistosBeforeDeltaR *
+selectedEvents3 = cms.EDAnalyzer('SelectedEvents',
+	path = cms.untracked.string("/cmshome/calabria/Events/EventsETT_Signal3/"),
+        muonSrc = cms.untracked.InputTag("muonVariables"),
+	eleSrc = cms.untracked.InputTag("electronVariables"),
+	tauSrc = cms.untracked.InputTag("selectedTausPt1"),
+)
+
+selectedEvents1 = cms.EDAnalyzer('SelectedEvents',
+	path = cms.untracked.string("/cmshome/calabria/Events/EventsETT_Signal1/"),
+        muonSrc = cms.untracked.InputTag("muonVariables"),
+	eleSrc = cms.untracked.InputTag("electronVariables"),
+	tauSrc = cms.untracked.InputTag("selectedTausPt2"),
+)
+
+selectedEvents2 = cms.EDAnalyzer('SelectedEvents',
+	path = cms.untracked.string("/cmshome/calabria/Events/EventsETT_Signal2/"),
+        muonSrc = cms.untracked.InputTag("muonVariables"),
+	eleSrc = cms.untracked.InputTag("electronVariables"),
+	tauSrc = cms.untracked.InputTag("selectedTausEleVeto2"),
+)
+
+tauSequence = cms.Sequence(#tau1Matching *
+			   TauHistosBeforeDeltaR *
 			   selectedTausByDeltaR *
 			   deltaRCut *
 			   #leadSubLeadTaus *
 			   #TAU1
 			   TauHistosBeforeTauPt1 *
 			   selectedTausPt1 *
+			   #selectedEvents3 *
 			   TauHistosBeforeTauEta *
 			   selectedTausEta *
 			   TauHistosBeforeTauID *
@@ -240,6 +270,7 @@ tauSequence = cms.Sequence(TauHistosBeforeDeltaR *
 			   selectedTausPt2 *
 				skimmedPairsPt2 *
 				skimmedPairsDeltaRPt2 *
+			   #selectedEvents1 *
 			   TauHistosBeforeTauEta2 *
 			   selectedTausEta2 *
 				skimmedPairsEta2 *
@@ -260,6 +291,7 @@ tauSequence = cms.Sequence(TauHistosBeforeDeltaR *
 			   selectedTausEleVeto2 *
 				skimmedPairsEleVeto2 *
 				skimmedPairsDeltaREleVeto2 *
+			   #selectedEvents2 *
 			   TauHistosAfterTau2Sequence 
 			   #subtractTaus * 
 			   #selectedTausHighestPt2
