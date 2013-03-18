@@ -74,6 +74,7 @@ class ZTauTauVeto : public edm::EDFilter {
       double cosCut1_;
       double mtCut2_;
       double cosCut2_;
+      bool filter_;
 };
 
 //
@@ -93,7 +94,8 @@ ZTauTauVeto::ZTauTauVeto(const edm::ParameterSet& iConfig):
   mtCut1_(iConfig.getUntrackedParameter<double>("mtCut1")),
   cosCut1_(iConfig.getUntrackedParameter<double>("cosCut1")),
   mtCut2_(iConfig.getUntrackedParameter<double>("mtCut2")),
-  cosCut2_(iConfig.getUntrackedParameter<double>("cosCut2"))
+  cosCut2_(iConfig.getUntrackedParameter<double>("cosCut2")),
+  filter_(iConfig.getParameter<bool>("filter"))
 {
    //now do what ever initialization is needed
    produces<reco::CompositeCandidateCollection>("");
@@ -137,8 +139,8 @@ ZTauTauVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    for(edm::View<reco::CompositeCandidate>::const_iterator CompCand=CompCandidates->begin(); CompCand!=CompCandidates->end(); ++CompCand){
 
-   	bool result1 = false;
-   	bool result2 = false;
+   	//bool result1 = false;
+   	//bool result2 = false;
 
 	const Candidate * WLepCand = CompCand->daughter(0);
 	const Candidate * DiTauCand = CompCand->daughter(1);
@@ -168,16 +170,21 @@ ZTauTauVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
         double Mt = TMath::Sqrt( scalarSumPt*scalarSumPt - vectorSumPt*vectorSumPt );
 
 	//std::cout<<"cos1: "<<cosTau1<<" cos2: "<<cosTau2<<" Mt: "<<Mt<<std::endl;
+	//std::cout<<"MET: "<<met<<std::endl;
 
-	if(!(cosTau1 < cosCut1_ && Mt < mtCut1_)) result1 = true;
-	if(!(cosTau2 < cosCut2_ && Mt < mtCut2_)) result2 = true;
+	//if(!(cosTau1 < cosCut1_ && Mt < mtCut1_)) result1 = true;
+	//if(!(cosTau2 < cosCut2_ && Mt < mtCut2_)) result2 = true;
+
+	//if(!(Mt < mtCut1_)) result1 = true;
+	//if(!(Mt < mtCut2_)) result2 = true;
 
 	//if(!(fabs(massWLeptonLeadTau-91.1876) < 12.476 && met < 30)){ 
 	//	result1 = true;
 	//	result2 = true;
 	//}
 
-	if(result1 & result2){
+	if(Mt > mtCut1_){
+		//std::cout<<"cos1: "<<cosTau1<<" cos2: "<<cosTau2<<" Mt: "<<Mt<<std::endl;
 		//std::cout<<"cos1: "<<cosTau1<<" cos2: "<<cosTau2<<" Mt: "<<Mt<<std::endl;
 		selectedFinalCand->push_back(*CompCand);
 		result = true;
@@ -186,6 +193,8 @@ ZTauTauVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
 
    iEvent.put(selectedFinalCand);
+   //std::cout<<"result "<<result<<std::endl;
+   if(!filter_) result = true;
    return result;
 
 }
