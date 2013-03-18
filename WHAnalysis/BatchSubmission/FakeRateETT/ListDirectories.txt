@@ -1,0 +1,12 @@
+TauPlusX_RunA_06Aug2012_FR1
+TauPlusX_RunA_13Jul2012_FR1
+TauPlusX_RunB_13Jul2012_FR1
+TauPlusX_RunC_24Aug2012_FR1 
+TauPlusX_RunC_PRv2_FR1
+TauPlusX_RunD_PRv1_FR1
+TauPlusX_RunA_06Aug2012_FR2
+TauPlusX_RunA_13Jul2012_FR2
+TauPlusX_RunB_13Jul2012_FR2
+TauPlusX_RunC_24Aug2012_FR2 
+TauPlusX_RunC_PRv2_FR2
+TauPlusX_RunD_PRv1_FR2

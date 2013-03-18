@@ -1,6 +1,6 @@
 #!/bin/bash
 
-path=$CMSSW_BASE/src/WHAnalysis/BatchSubmission/CFGFiles/ETT
+path=$CMSSW_BASE/src/WHAnalysis/BatchSubmission/FakeRateETT/CFGFiles/ETT_ValFR
 
 for i in `cat ListDirectories.txt`; do
 
@@ -14,4 +14,3 @@ for i in `cat ListDirectories.txt`; do
 	done
 
 done
-

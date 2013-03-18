@@ -3,17 +3,16 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("WMuNuHTauTauAnalyzer")
 
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.MessageLogger.cerr.FwkReport.reportEvery = 5000
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
+process.MessageLogger.cerr.FwkReport.reportEvery = 10000
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-from Configuration.PyReleaseValidation.autoCond import autoCond
-process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
-process.MessageLogger.cerr.FwkReport.reportEvery = 10000
+process.GlobalTag.globaltag = cms.string("START53_V16::All")
+
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 
@@ -21,7 +20,7 @@ process.source = cms.Source("PoolSource",
 
         )
 )
-
+process.source.skipBadFiles = cms.untracked.bool( True )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 
@@ -39,26 +38,21 @@ process.load("WHAnalysis.Configuration.CompositeCandidateCreator_ett_cff")
 process.load("WHAnalysis.Configuration.JetSelector_cff")
 process.load("WHAnalysis.Configuration.METSelector_cff")
 process.load("WHAnalysis.Configuration.TauTauPairSelector_ett_cff")
+process.load("WHAnalysis.Configuration.skimming_ett_cff")
 
 process.hltSelection.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
-process.hltSelection.HLTPaths = cms.vstring("HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_v",
-					    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v",
-					    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_v",
-					    "HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_v",
-					    "HLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_v")
-process.hltSelection.hltEventRanges = cms.VEventRange("160404:MIN-163869:MAX",
-						      "165088:MIN-167913:MAX",
-						      "170249:MIN-173198:MAX",
-						      "173236:MIN-173692:MAX",
-						      "175860:MIN-180252:MAX")
-#process.hltSelection.defaultTrigger = cms.string("HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_v")
+process.hltSelection.HLTPaths = cms.vstring("HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v",
+					    "HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v")
+process.hltSelection.hltEventRanges = cms.VEventRange("190456:MIN-193680:MAX",
+						      "193752:MIN-208357:MAX")
+#process.hltSelection.defaultTrigger = cms.string("HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v")
 process.hltSelection.defaultTrigger = cms.string("")
 
 process.TriggerHistosBeforeSel.hltResultsSource = cms.InputTag('TriggerResults::HLT')
-process.TriggerHistosBeforeSel.hltPaths = cms.vstring('HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_v')
+process.TriggerHistosBeforeSel.hltPaths = cms.vstring('HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v')
 
 process.TriggerHistosAfterSel.hltResultsSource = cms.InputTag('TriggerResults::HLT')
-process.TriggerHistosAfterSel.hltPaths = cms.vstring('HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_v')
+process.TriggerHistosAfterSel.hltPaths = cms.vstring('HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v')
 
 #################################################################################################################################
 #PU Correction for MC samples only
@@ -120,6 +114,7 @@ process.DiTauHistosBeforeMET.isMC = cms.untracked.bool(isMCBool.value())
 process.DiTauHistosBeforeCharge.isMC = cms.untracked.bool(isMCBool.value())
 process.DiTauHistosBeforeDeltaR.isMC = cms.untracked.bool(isMCBool.value())
 process.DiTauHistosBeforeOnePair.isMC = cms.untracked.bool(isMCBool.value())
+process.DiTauHistosForETauJet.isMC = cms.untracked.bool(isMCBool.value())
 process.DiTauHistosFinalForTauTau.isMC = cms.untracked.bool(isMCBool.value())
 process.DiTauHistosFinal.isMC = cms.untracked.bool(isMCBool.value())
 process.eePairsVeto.isMC = cms.untracked.bool(isMCBool.value())
@@ -144,16 +139,24 @@ process.out = cms.OutputModule("PoolOutputModule",
 #################################################################################################################################
 
 process.selectedEvents = cms.EDAnalyzer('SelectedEvents',
-	path = cms.untracked.string("/cmshome/calabria/Events/EventsETT/"),
-        muonSrc = cms.untracked.InputTag("selectedMuonsIso"),
-	eleSrc = cms.untracked.InputTag("selectedElectronsIPz"),
-	tauSrc = cms.untracked.InputTag("selectedTausHighestPt:TauHighestPt"),
+	path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Events/EventsETT_Signal_MET/"),
+        muonSrc = cms.untracked.InputTag("muonVariables"),
+	eleSrc = cms.untracked.InputTag("electronVariables"),
+	tauSrc = cms.untracked.InputTag("tauVariables"),
+	jetSrc = cms.untracked.InputTag("patJets")
 )
 
 process.puDistribution = cms.EDAnalyzer('PuDistribution')
 
 process.genFilter.process = cms.untracked.int32(2)
 
+process.producesUserDefinedVarsEle.isMC = cms.bool(True)
+process.producesUserDefinedVarsTau.isMC = cms.bool(True)
+
+process.eleMatching.filter = cms.bool(False)
+process.tau1Matching.filter = cms.bool(False)
+process.selectedElectronsPt.src = cms.InputTag("producesUserDefinedVarsEle")
+process.selectedTausByDeltaR.tauSrc = cms.untracked.InputTag("producesUserDefinedVarsTau")
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string(
 
@@ -162,20 +165,26 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string(
 	)
 )
 
-process.mypath = cms.Path(process.producesUserDefinedVarsEle *
+process.ettFinalState = cms.EDFilter('MCTruthFullyHadronic',
+     genParticles = cms.untracked.InputTag("genParticles"),
+     filter = cms.bool(True)
+)
+
+process.mypath = cms.Path(#process.skimmingSequence *
+			  process.producesUserDefinedVarsEle *
 			  process.producesUserDefinedVarsTau *
 			  process.puDistribution * #Enable only for MC samples
 			  process.VertexHistosBeforeMCFilter *
 			  process.genFilter * #Enable only for Signal
 			  process.VertexHistosBeforeMCFilter2 *
+			  #process.ettFinalState *
 			  process.triggerSequence *
 			  process.vertexSequence *
 			  process.electronSequence *
 			  process.muonSequence *
 			  process.tauSequence *
+			  #process.allCorrectionsEle * process.allCorrectionsTau1 * process.allCorrectionsTau2 *
 			  process.VertexHistosForPU *
-			  process.jetSequence *
-			  process.selectedMETMax *
 			  process.selectedTau1Tau2 *
 			  process.TauTauSequence *
 			  process.selectedEleTau1Tau2Cand *
@@ -190,12 +199,15 @@ process.mypath = cms.Path(process.producesUserDefinedVarsEle *
 			  	  process.ztautauVeto *
 			  process.CompCandHistosAfterSel *
 			  process.selectedCompCandUW *
-			  process.CompCandHistosAfterSelLt *
-			  (process.MuonHistosFinal + process.EleHistosFinal + process.TauHistosFinal1 + process.TauHistosFinal2 + process.DiTauHistosFinal)
+			  process.jetSequence *
+			  process.selectedMETMax *
+			  process.CompCandHistosAfterSelLt
+			  #(process.MuonHistosFinal + process.EleHistosFinal + process.TauHistosFinal1 + process.TauHistosFinal2 + process.DiTauHistosFinal)
 			  #process.mcMatching *
 			  #process.compositeCandidateSequenceMcAssignment *
 			  #process.massPlotsMcAssignment *
 			  #process.massPlotsLowPtLepton *
+			  #process.selectedEvents
 			  #process.selectedEvents
 )
 

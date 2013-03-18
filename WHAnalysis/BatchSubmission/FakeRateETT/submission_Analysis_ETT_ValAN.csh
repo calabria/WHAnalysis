@@ -1,8 +1,8 @@
 #!/bin/bash
 
-path=$CMSSW_BASE/src/WHAnalysis/BatchSubmission/CFGFiles/ETT
+path=$CMSSW_BASE/src/WHAnalysis/BatchSubmission/FakeRateETT/CFGFiles/ETT_ValAN
 
-for i in `cat ListDirectories.txt`; do
+for i in `cat ListDirectories2.txt`; do
 
 	cd $path/$i
 	for batch in `ls $path/$i/*.csh`; do
@@ -14,4 +14,3 @@ for i in `cat ListDirectories.txt`; do
 	done
 
 done
-

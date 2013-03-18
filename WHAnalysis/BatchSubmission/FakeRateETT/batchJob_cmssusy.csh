@@ -5,7 +5,7 @@ limit vmem unlim
 mkdir #__savingPath
 
 cd #__pathCFG
-setenv SCRAM_ARCH slc5_amd64_gcc434
+setenv SCRAM_ARCH slc5_amd64_gcc462
 eval `scramv1 runtime -csh`
 cd -
 cmsRun #__nameCFG

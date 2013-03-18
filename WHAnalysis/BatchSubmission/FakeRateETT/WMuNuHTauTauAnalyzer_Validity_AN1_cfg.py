@@ -20,16 +20,6 @@ process.source = cms.Source("PoolSource",
 
         ),
 
-    #eventsToProcess = cms.untracked.VEventRange('196364:67:72461695',
-	#					'196452:417:593693183',
-	#					'198969:936:1101911220',
-	#					'201707:962:1129870071')
-
-    #eventsToProcess = cms.untracked.VEventRange('201658:171:301110039') #two cands
-
-    #eventsToProcess = cms.untracked.VEventRange('195304:80:113903457')
-
-
 )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -141,22 +131,27 @@ process.CompCandHistosBeforeZeeStep4.isMC = cms.untracked.bool(isMCBool.value())
 #################################################################################################################################
 
 process.out = cms.OutputModule("PoolOutputModule",
-                fileName = cms.untracked.string("/tmp/calabria/test.root"),
+                fileName = cms.untracked.string("test.root"),
 		outputCommands = cms.untracked.vstring(
-		#'keep *',
-      		"keep *_*_*_EleTauAnalyzer"
+		'keep *',
+      		#"keep *_*_*_EleTauAnalyzer"
 		)
         )
 
 #################################################################################################################################
 
-process.selectedEvents = cms.EDAnalyzer('SelectedEvents',
-	path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Events/EventsETT_Signal_MET/"),
-        muonSrc = cms.untracked.InputTag("muonVariables"),
-	eleSrc = cms.untracked.InputTag("selectedElectronsTrk"),
-	tauSrc = cms.untracked.InputTag("selectedTauTauPairsByCharge:selectedCand1Cand2PairsByCharge"),
-	jetSrc = cms.untracked.InputTag("patJets")
-)
+process.selectedTausPt1.cut = cms.string('pt > 25.0')
+process.selectedTausPt2.cut = cms.string('pt > 20.0')
+
+process.selectedTausIso.cut = cms.string('tauID("byTightCombinedIsolationDeltaBetaCorr") > 0.5')
+process.selectedTausIso2.cut = cms.string('tauID("byLooseCombinedIsolationDeltaBetaCorr") > 0.5')
+
+process.selectedCompCandCharge = cms.EDFilter("CompCandChargeFilter",
+	CompCandSrc = cms.untracked.InputTag("ztautauVeto"),
+	applyCharge1 = cms.untracked.bool(True), #is SS with e??
+	applyCharge2 = cms.untracked.bool(False),
+	filter = cms.bool(True)
+	)
 
 process.CompCandHistosAfterSelLt1 = cms.EDAnalyzer('CompositeCandHistManager',
        CompCandSrc = cms.untracked.InputTag("selectedCompCandUW"),
@@ -164,7 +159,7 @@ process.CompCandHistosAfterSelLt1 = cms.EDAnalyzer('CompositeCandHistManager',
        MCDist = cms.untracked.vdouble(1),
        TrueDist2011 = cms.untracked.vdouble(1),
        isMC = cms.untracked.bool(False),
-       isFR = cms.untracked.int32(0),
+       isFR = cms.untracked.int32(1),
 )
 
 process.CompCandHistosAfterSelLt2 = cms.EDAnalyzer('CompositeCandHistManager',
@@ -173,7 +168,7 @@ process.CompCandHistosAfterSelLt2 = cms.EDAnalyzer('CompositeCandHistManager',
        MCDist = cms.untracked.vdouble(1),
        TrueDist2011 = cms.untracked.vdouble(1),
        isMC = cms.untracked.bool(False),
-       isFR = cms.untracked.int32(0),
+       isFR = cms.untracked.int32(2),
 )
 
 process.CompCandHistosAfterSelLt3 = cms.EDAnalyzer('CompositeCandHistManager',
@@ -182,8 +177,76 @@ process.CompCandHistosAfterSelLt3 = cms.EDAnalyzer('CompositeCandHistManager',
        MCDist = cms.untracked.vdouble(1),
        TrueDist2011 = cms.untracked.vdouble(1),
        isMC = cms.untracked.bool(False),
-       isFR = cms.untracked.int32(0),
+       isFR = cms.untracked.int32(3),
 )
+
+process.CompCandHistosAfterSel.CompCandSrc = cms.untracked.InputTag("selectedCompCandCharge")
+process.selectedCompCandUW.CompCandSrc = cms.untracked.InputTag("selectedCompCandCharge")
+
+############### Signal veto
+
+process.selectedTau1Sign = cms.EDFilter("PATTauSelector",
+	src = cms.InputTag("selectedTausByDeltaR:TauSelByDeltaR"),
+	cut = cms.string('tauID("byTightCombinedIsolationDeltaBetaCorr") > 0.5 && tauID("againstMuonTight") > 0.5 && tauID("againstElectronTight") > 0.5'),
+	filter = cms.bool(False)
+	)
+
+process.selectedTau2Sign = cms.EDFilter("PATTauSelector",
+	src = cms.InputTag("selectedTausByDeltaR:TauSelByDeltaR"),
+	cut = cms.string('tauID("byMediumCombinedIsolationDeltaBetaCorr") > 0.5 && tauID("againstMuonTight") > 0.5 && tauID("againstElectronMedium") > 0.5'),
+	filter = cms.bool(False)
+	)
+
+process.selectedTau1Tau2Sign = cms.EDProducer("CandViewShallowCloneCombiner",
+	decay = cms.string("selectedTau1Sign@+ selectedTau2Sign@-"),
+	roles = cms.vstring('tau1', 'tau2'),
+	cut =  cms.string("deltaR(daughter('tau1').eta,daughter('tau1').phi,daughter('tau2').eta,daughter('tau2').phi) > 0.5"),
+	checkCharge = cms.bool(True)
+      	)
+
+selLongDist = "(abs(daughter('ele').vz - daughter('tau1tau2').daughter(0).vz) < 0.14 && abs(daughter('ele').vz - daughter('tau1tau2').daughter(1).vz) < 0.14)"
+
+process.selectedEleTau1Tau2CandSign = cms.EDProducer("CandViewShallowCloneCombiner",
+	decay = cms.string("selectedElectronsTrk selectedTau1Tau2Sign"),
+	roles = cms.vstring('ele', 'tau1tau2'),
+	cut = cms.string(selLongDist),
+	checkCharge = cms.bool(False)
+  	)
+
+process.selectedCompCandNearZSgn = cms.EDFilter("ZEleTauVeto",
+	CompCandSrc = cms.untracked.InputTag("selectedEleTau1Tau2CandSign"),
+	cut = cms.untracked.double(6),
+	filter = cms.bool(False)
+	)
+
+process.ztautauVetoSgn = cms.EDFilter('ZTauTauVeto',
+	CompCandSrc = cms.untracked.InputTag("selectedCompCandNearZSgn"),
+	PFMetTag = cms.untracked.InputTag('patPFMetByMVA'),
+	cosCut1 = cms.untracked.double(-0.5),
+	mtCut1 = cms.untracked.double(50),
+	cosCut2 = cms.untracked.double(-0.5),
+	mtCut2 = cms.untracked.double(50),
+	filter = cms.bool(False)
+	)
+
+process.rejectSgnEvent = cms.EDFilter("PATCandViewCountFilter",
+	src = cms.InputTag("ztautauVetoSgn"),
+	minNumber = cms.uint32(0),
+	maxNumber = cms.uint32(0),
+	filter = cms.bool(True)
+	)
+
+process.sequenceSgn = cms.Sequence(
+	process.selectedTau1Sign *
+	process.selectedTau2Sign *
+	process.selectedTau1Tau2Sign *
+	process.selectedEleTau1Tau2CandSign *
+	process.selectedCompCandNearZSgn *
+	process.ztautauVetoSgn *
+	process.rejectSgnEvent
+	)
+
+############### Signal veto
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string(
 
@@ -195,7 +258,6 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string(
 process.mypath = cms.Path(#process.skimmingSequence *
 			  #process.producesUserDefinedVarsEle *
 			  #process.producesUserDefinedVarsTau *
-			  #process.puDistribution * #Enable only for MC samples
 			  process.VertexHistosBeforeMCFilter *
 			  #process.genFilter * #Enable only for Signal
 			  process.VertexHistosBeforeMCFilter2 *
@@ -227,19 +289,20 @@ process.mypath = cms.Path(#process.skimmingSequence *
 				  ### Ztt veto
 			 	  process.CompCandHistosBeforeZttVeto *
 			  	  process.ztautauVeto *
+			  process.selectedCompCandCharge *
 			  process.CompCandHistosAfterSel *
 			  process.selectedCompCandUW *
 			  process.jetSequence *
 			  process.CompCandHistosBeforeMet *
 			  process.selectedMETMax *
+			  #process.sequenceSgn *
 			  process.CompCandHistosAfterSelLt *
 			  process.CompCandHistosAfterSelLt1 *
 			  process.CompCandHistosAfterSelLt2 *
-			  process.CompCandHistosAfterSelLt3 *
-			  process.selectedEvents
+			  process.CompCandHistosAfterSelLt3
 )
 
-#process.outp1=cms.OutputModule("PoolOutputModule",
+#process.outp1 = cms.OutputModule("PoolOutputModule",
 #        fileName = cms.untracked.string('savep1.root'),
 #        SelectEvents = cms.untracked.PSet(
 #                SelectEvents = cms.vstring('mypath')

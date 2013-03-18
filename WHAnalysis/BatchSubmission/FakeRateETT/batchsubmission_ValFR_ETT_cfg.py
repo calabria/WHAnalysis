@@ -14,13 +14,13 @@ CMSSW_BASE       = os.environ['CMSSW_BASE']
 pathForSaving    = "/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/"
 pathCFGLocation  = CMSSW_BASE + "/src/WHAnalysis/BatchSubmission/FakeRateETT/"
 fileLocation     = CMSSW_BASE + "/src/WHAnalysis/BatchSubmission/TXTFiles/"
-channel          = "ETT"
+channel          = "ETT_ValFR"
 cshTemp          = "batchJob_cmssusy.csh"
 
 process.TauPlusX_RunA_06Aug2012_FR1 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep1_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR1_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunA_06Aug2012_FR1"),
@@ -33,7 +33,7 @@ process.TauPlusX_RunA_06Aug2012_FR1 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunA_13Jul2012_FR1 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep1_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR1_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunA_13Jul2012_FR1"),
@@ -46,7 +46,7 @@ process.TauPlusX_RunA_13Jul2012_FR1 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunB_13Jul2012_FR1 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep1_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR1_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunB_13Jul2012_FR1"),
@@ -59,7 +59,7 @@ process.TauPlusX_RunB_13Jul2012_FR1 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunC_24Aug2012_FR1 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep1_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR1_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunC_24Aug2012_FR1"),
@@ -72,7 +72,7 @@ process.TauPlusX_RunC_24Aug2012_FR1 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunC_PRv2_FR1 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep1_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR1_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunC_PRv2_FR1"),
@@ -85,7 +85,7 @@ process.TauPlusX_RunC_PRv2_FR1 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunD_PRv1_FR1 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep1_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR1_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunD_PRv1_FR1"),
@@ -98,7 +98,7 @@ process.TauPlusX_RunD_PRv1_FR1 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunA_06Aug2012_FR2 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep2_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR2_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunA_06Aug2012_FR2"),
@@ -111,7 +111,7 @@ process.TauPlusX_RunA_06Aug2012_FR2 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunA_13Jul2012_FR2 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep2_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR2_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunA_13Jul2012_FR2"),
@@ -124,7 +124,7 @@ process.TauPlusX_RunA_13Jul2012_FR2 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunB_13Jul2012_FR2 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep2_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR2_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunB_13Jul2012_FR2"),
@@ -137,7 +137,7 @@ process.TauPlusX_RunB_13Jul2012_FR2 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunC_24Aug2012_FR2 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep2_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR2_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunC_24Aug2012_FR2"),
@@ -150,7 +150,7 @@ process.TauPlusX_RunC_24Aug2012_FR2 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunC_PRv2_FR2 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep2_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR2_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunC_PRv2_FR2"),
@@ -163,7 +163,7 @@ process.TauPlusX_RunC_PRv2_FR2 = cms.EDAnalyzer('BatchSubmission',
 process.TauPlusX_RunD_PRv1_FR2 = cms.EDAnalyzer('BatchSubmission',
 
 	finalState = cms.untracked.string(channel),
-	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_FakeRateLep2_cfg.py"),
+	fileCFG = cms.untracked.string("WMuNuHTauTauAnalyzer_Validity_FR2_cfg.py"),
 	fileCSH = cms.untracked.string(cshTemp),
 
 	sample = cms.untracked.string("TauPlusX_RunD_PRv1_FR2"),
