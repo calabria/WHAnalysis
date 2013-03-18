@@ -236,6 +236,7 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	//if(folder == "TriggerHistosBeforeSel") continue;
 	//if(folder == "TriggerHistosAfterSel") continue;
 	if(folder == "puDistribution") continue;
+	if(folder != "CompCandHistosAfterSelLt3") continue;
 	dirStructure.push_back(folder);
 	//gDirectory->pwd();
         fileIn->cd();
@@ -289,6 +290,12 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	if(histoType[k] == 0){
 
    	   TCanvas * cvStack = new TCanvas("","",700,700);
+	   TPad *pad1 = new TPad("pad1", "The pad 70% of the height",0.0,0.3,1.0,1.0,10);
+	   TPad *pad2 = new TPad("pad2", "The pad 30% of the height",0.0,0.0,1.0,0.3,10);
+	   pad1->Draw();
+	   pad2->Draw();
+	   pad1->cd();
+
    	   THStack * hs = new THStack(histoStructure[k].c_str(),histoStructure[k].c_str());
       	   TLegend * legend = new TLegend(legendDim_[0],legendDim_[1],legendDim_[2],legendDim_[3]);
 	   std::string titleXaxis;
@@ -308,10 +315,10 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			   TH1F *histoTMP = (TH1F*)gDirectory->Get(histoStructure[k].c_str());
 			   //double scaledEvents = nEntries * scaleFactor;
 			   //if(histoTMP->GetSize()%2 == 0 && histoStructure[k].find("TauRecDecayMode") == string::npos) histoTMP->Rebin();
-			   if(histoStructure[k].find("/VisMass") != string::npos) histoTMP->Rebin(3);
-			   if(histoStructure[k].find("DiTauHistosFinal/Pt_Ditau") != string::npos) histoTMP->Rebin(4);
-			   if(histoStructure[k].find("EleHistosFinal/elePt") != string::npos) histoTMP->Rebin(4);
-			   if(histoStructure[k].find("CompCandHistosBeforeSel/Lt") != string::npos) histoTMP->Rebin();
+			   //if(histoStructure[k].find("/VisMass") != string::npos) histoTMP->Rebin(3);
+			   //if(histoStructure[k].find("DiTauHistosFinal/Pt_Ditau") != string::npos) histoTMP->Rebin(4);
+			   //if(histoStructure[k].find("EleHistosFinal/elePt") != string::npos) histoTMP->Rebin(4);
+			   //if(histoStructure[k].find("CompCandHistosBeforeSel/Lt") != string::npos) histoTMP->Rebin();
 			   histoTMP->SetLineColor(1);
 			   histoTMP->SetFillColor(setColors_[i]);
 		 	   histoTMP->SetFillStyle(1000);
@@ -340,16 +347,18 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	   double maxMC = hs->GetMaximum();
 	   double maxData = 0;
 
-	   //TH1F * stack = (TH1F*)hs->GetStack()->Last();
+	   TH1F * stack = (TH1F*)hs->GetStack()->Last()->Clone();
+	   TH1F * histoData2;
 
 	   if(data_ != ""){
 	   	TFile * fileData = TFile::Open(data_.c_str());
 	   	TH1F *histoData = (TH1F*)gDirectory->Get(histoStructure[k].c_str());
+	   	histoData2 = (TH1F*)histoData->Clone();
 	   	legend->AddEntry(histoData, "Data", "p");
-		if(histoStructure[k].find("/VisMass") != string::npos) histoData->Rebin(3);
-		if(histoStructure[k].find("DiTauHistosFinal/Pt_Ditau") != string::npos) histoData->Rebin(4);
-		if(histoStructure[k].find("EleHistosFinal/elePt") != string::npos) histoData->Rebin(4);
-		if(histoStructure[k].find("CompCandHistosBeforeSel/Lt") != string::npos) histoData->Rebin();
+		//if(histoStructure[k].find("/VisMass") != string::npos) histoData->Rebin(3);
+		//if(histoStructure[k].find("DiTauHistosFinal/Pt_Ditau") != string::npos) histoData->Rebin(4);
+		//if(histoStructure[k].find("EleHistosFinal/elePt") != string::npos) histoData->Rebin(4);
+		//if(histoStructure[k].find("CompCandHistosBeforeSel/Lt") != string::npos) histoData->Rebin();
 		histoData->SetMarkerColor(1);
 		histoData->SetMarkerStyle(20);
 		histoData->SetMarkerSize(0.5);
@@ -362,9 +371,26 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	   legend->SetFillColor(10);
 	   legend->Draw();
 
-	   std::string title = " CMS Preliminary 2011      #sqrt{s} = " + energy_ + "   L = " + lumi_;
+	   std::string title = " CMS Preliminary 2012      #sqrt{s} = " + energy_ + "   #int L = " + lumi_;
 	   hs->SetTitle(title.c_str());
 	   setTDRStyle();
+
+	   pad2->cd();
+  	   pad2->SetGridx();
+   	   pad2->SetGridy();
+   	   //pad2->SetLogy();
+	   histoData2->Add(stack, -1);
+	   histoData2->Divide(stack);
+	   histoData2->SetTitle("");
+	   histoData2->GetYaxis()->SetTitle("(obs-exp)/exp");
+	   histoData2->GetYaxis()->SetTitleSize(0.06);
+  	   histoData2->GetYaxis()->SetLabelSize(0.06);
+	   histoData2->GetXaxis()->SetTitleSize(0.06);
+  	   histoData2->GetXaxis()->SetLabelSize(0.06);
+  	   histoData2->SetMarkerColor(1);
+  	   histoData2->SetMarkerStyle(20);
+  	   histoData2->SetMarkerSize(0.5);
+	   histoData2->Draw("1ep");
 
 	   std::string saveName;
            if(logScale_) saveName = "./Plots/" + process_ + "/plots_stack_log/" + histoNamesForSaving[k] + ".png";
@@ -428,7 +454,8 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	   legend->SetFillColor(10);
 	   legend->Draw();
 
-	   hs->SetTitle(" CMS Preliminary 2011      #sqrt{s} = 7 TeV   L = 4.6 fb^{-1}");
+	   std::string title = " CMS Preliminary 2012      #sqrt{s} = " + energy_ + "   L = " + lumi_;
+	   hs->SetTitle(title.c_str());
 	   setTDRStyle();
 
            std::string saveName = "./Plots/" + process_ + "/plots_nostack/" + histoNamesForSaving[k] + ".png";
@@ -533,7 +560,7 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			TFile * fileIn = TFile::Open(nameAndPath.c_str());
 			fileIn->cd();
 			TH1F *histoTMP = (TH1F*)gDirectory->Get(name.c_str());
-			TH1F *histoTMPEvt = (TH1F*)gDirectory->Get("TriggerHistosBeforeSel/N_eventi_PU");
+			TH1F *histoTMPEvt = (TH1F*)gDirectory->Get("VertexHistosBeforeMCFilter2/N_eventi_PU");
 			double numEvents = histoTMP->GetBinContent(2);
 			double eventsAtBeginning = histoTMPEvt->GetBinContent(2);
 			double numEventsErr = histoTMP->GetBinError(2);
@@ -552,7 +579,7 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			TFile * fileData = TFile::Open(data_.c_str());
 			fileData->cd();
 		   	TH1F *histoData = (TH1F*)gDirectory->Get(name.c_str());
-			TH1F *histoTMPEvt = (TH1F*)gDirectory->Get("TriggerHistosBeforeSel/N_eventi_PU");
+			TH1F *histoTMPEvt = (TH1F*)gDirectory->Get("VertexHistosBeforeMCFilter2/N_eventi_PU");
 			double numEvents = histoData->GetBinContent(2);
 			double eventsAtBeginning = histoTMPEvt->GetBinContent(2);
 			double absEff = 0;
