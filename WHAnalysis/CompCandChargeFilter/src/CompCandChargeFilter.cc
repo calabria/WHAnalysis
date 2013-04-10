@@ -136,8 +136,14 @@ CompCandChargeFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	int WLepDiTauCand1Charge = WLepCharge * DiTauCand1Charge;
 	int WLepDiTauCand2Charge = WLepCharge * DiTauCand2Charge;
 
-	if(applyCharge1_ && WLepDiTauCand1Charge > 0) result = true;
-	else if(applyCharge2_ && WLepDiTauCand2Charge > 0) result = true;
+	if(applyCharge1_ && WLepDiTauCand1Charge > 0){
+		result = true;
+		selectedCompCandCharge->push_back(*CompCand);
+	}
+	else if(applyCharge2_ && WLepDiTauCand2Charge > 0){
+		result = true;
+		selectedCompCandCharge->push_back(*CompCand);
+	}
 
    }
 
