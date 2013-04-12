@@ -11,7 +11,7 @@
      [Notes on implementation]
 */
 //
-// Original Author:  
+// Original Author:  Cesare Calabria
 //         Created:  Sat May 26 13:06:20 CEST 2012
 // $Id$
 //
@@ -154,9 +154,26 @@ CompCandIsoFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		int isoTau1 = tau1.tauID("byTightCombinedIsolationDeltaBetaCorr");
 		int isoTau2 = tau2.tauID("byMediumCombinedIsolationDeltaBetaCorr");
 
-		if(isFR_) result = (trigMatch1 == 1 && isoTau1 == condVec_[0] && isoTau2 == condVec_[1]);
-		//else result = (trigMatch1 == 1 && isoTau1 == condVec_[0] && isoTau2 == condVec_[1]);
-		else result = (isoTau1 == condVec_[0] && isoTau2 == condVec_[1]);
+		if(isFR_){
+
+			if(trigMatch1 == 1 && isoTau1 == condVec_[0] && isoTau2 == condVec_[1]){
+
+				result = true;
+				selectedCompCandIso->push_back(*CompCand);
+
+			}
+
+		}
+		else{
+
+			if(trigMatch1 == 1 && isoTau1 == condVec_[0] && isoTau2 == condVec_[1]){
+
+				result = true;
+				selectedCompCandIso->push_back(*CompCand);
+
+			}
+
+		}
 
 	}
 	else{//Tau2 real, Tau1 fakeable
@@ -166,13 +183,28 @@ CompCandIsoFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		int isoTau1 = tau1.tauID("byTightCombinedIsolationDeltaBetaCorr");
 		int isoTau2 = tau2.tauID("byMediumCombinedIsolationDeltaBetaCorr");
 
-		if(isFR_) result = (trigMatch2 == 1 && isoTau1 == condVec_[1] && isoTau2 == condVec_[0]);
-		//else result = (trigMatch2 == 1 && isoTau1 == condVec_[1] && isoTau2 == condVec_[0]);
-		else result = (isoTau1 == condVec_[1] && isoTau2 == condVec_[0]);
+		if(isFR_){
+
+			if(trigMatch2 == 1 && isoTau1 == condVec_[1] && isoTau2 == condVec_[0]){
+
+				result = true;
+				selectedCompCandIso->push_back(*CompCand);
+
+			}
+
+		}
+		else{
+
+			if(trigMatch2 == 1 && isoTau1 == condVec_[1] && isoTau2 == condVec_[0]){
+
+				result = true;
+				selectedCompCandIso->push_back(*CompCand);
+
+			}
+
+		}
 
 	}
-
-	if(result) selectedCompCandIso->push_back(*CompCand);
 
    }
 
