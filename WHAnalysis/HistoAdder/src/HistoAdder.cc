@@ -216,6 +216,7 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
   std::vector<std::string> dirStructure;
+  std::vector<std::string> onlyHistos;
   std::vector<std::string> histoStructure;
   std::vector<std::string> histoNamesForSaving;
   std::vector<double> eventsAtBeginning;
@@ -236,7 +237,7 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	//if(folder == "TriggerHistosBeforeSel") continue;
 	//if(folder == "TriggerHistosAfterSel") continue;
 	if(folder == "puDistribution") continue;
-	if(folder != "CompCandHistosAfterSelLt3") continue;
+	if(folder != "CompCandHistosAfterSelLt" && folder != "CompCandHistosAfterSelLt1" && folder != "CompCandHistosAfterSelLt2" && folder != "CompCandHistosAfterSelLt3") continue;
 	dirStructure.push_back(folder);
 	//gDirectory->pwd();
         fileIn->cd();
@@ -247,6 +248,7 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		//std::cout<<"key: "<<key2->GetName()<<" points to an object of class:"<<key2->GetClassName()<<std::endl;
 		TObject * obj = key2->ReadObj();
 		std::string histoName = key2->GetName();
+		onlyHistos.push_back(histoName);
 		//if(histoName == "TriggerHLT_Mu17_Ele8_CaloIdL_v") continue;
 		std::string folderHisto = folder + "/" + histoName;
 		std::string namesForSaving = folder + "_" + histoName;
@@ -312,13 +314,28 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			   TFile * fileIn = TFile::Open(nameAndPath.c_str());
 			   fileIn->cd();
 			   std::cout<<"histoName "<<histoStructure[k].c_str()<<std::endl;
-			   TH1F *histoTMP = (TH1F*)gDirectory->Get(histoStructure[k].c_str());
+			   TH1F * histoTMP;
+			   //if(i == 0) histoTMP = (TH1F*)gDirectory->Get(("CompCandHistosAfterSelLt/" + onlyHistos[k]).c_str());    
+			   //else histoTMP = (TH1F*)gDirectory->Get(histoStructure[k].c_str());	  
+			   histoTMP = (TH1F*)gDirectory->Get(histoStructure[k].c_str());	   	 	
 			   //double scaledEvents = nEntries * scaleFactor;
 			   //if(histoTMP->GetSize()%2 == 0 && histoStructure[k].find("TauRecDecayMode") == string::npos) histoTMP->Rebin();
 			   //if(histoStructure[k].find("/VisMass") != string::npos) histoTMP->Rebin(3);
 			   //if(histoStructure[k].find("DiTauHistosFinal/Pt_Ditau") != string::npos) histoTMP->Rebin(4);
 			   //if(histoStructure[k].find("EleHistosFinal/elePt") != string::npos) histoTMP->Rebin(4);
 			   //if(histoStructure[k].find("CompCandHistosBeforeSel/Lt") != string::npos) histoTMP->Rebin();
+			   if(histoStructure[k].find("DiTauCandSSEta") != string::npos) {
+
+				histoTMP->Rebin(3);
+				//histoTMP->GetXaxis()->SetTitle("#eta");
+	
+			   }
+			   /*if(histoStructure[k].find("DiTauCandSSPt") != string::npos){
+
+				histoTMP->Rebin(5);
+			 	histoTMP->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+
+			   }*/
 			   histoTMP->SetLineColor(1);
 			   histoTMP->SetFillColor(setColors_[i]);
 		 	   histoTMP->SetFillStyle(1000);
@@ -349,16 +366,31 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	   TH1F * stack = (TH1F*)hs->GetStack()->Last()->Clone();
 	   TH1F * histoData2;
+	   TH1F * histoData3;
 
 	   if(data_ != ""){
 	   	TFile * fileData = TFile::Open(data_.c_str());
-	   	TH1F *histoData = (TH1F*)gDirectory->Get(histoStructure[k].c_str());
+	   	//TH1F *histoData = (TH1F*)gDirectory->Get(("CompCandHistosAfterSelLt/" + onlyHistos[k]).c_str());
+		TH1F *histoData = (TH1F*)gDirectory->Get(histoStructure[k].c_str());
 	   	histoData2 = (TH1F*)histoData->Clone();
+	   	histoData3 = (TH1F*)histoData->Clone();
 	   	legend->AddEntry(histoData, "Data", "p");
 		//if(histoStructure[k].find("/VisMass") != string::npos) histoData->Rebin(3);
 		//if(histoStructure[k].find("DiTauHistosFinal/Pt_Ditau") != string::npos) histoData->Rebin(4);
 		//if(histoStructure[k].find("EleHistosFinal/elePt") != string::npos) histoData->Rebin(4);
 		//if(histoStructure[k].find("CompCandHistosBeforeSel/Lt") != string::npos) histoData->Rebin();
+		if(histoStructure[k].find("DiTauCandSSEta") != string::npos) {
+			histoData->Rebin(3);
+			histoData2->Rebin(3);
+			histoData3->Rebin(3);
+			//histoData2->GetXaxis()->SetTitle("#eta");
+		}
+		/*if(histoStructure[k].find("DiTauCandSSPt") != string::npos){
+			histoData->Rebin(5);
+			histoData2->Rebin(5);
+			histoData3->Rebin(5);
+		 	histoData2->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+		}*/
 		histoData->SetMarkerColor(1);
 		histoData->SetMarkerStyle(20);
 		histoData->SetMarkerSize(0.5);
@@ -380,17 +412,66 @@ HistoAdder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    	   pad2->SetGridy();
    	   //pad2->SetLogy();
 	   histoData2->Add(stack, -1);
-	   histoData2->Divide(stack);
+	   histoData2->Divide(histoData3);
+	   for(int i=1; i<histoData2->GetSize(); i++){
+
+		float diff = histoData2->GetBinContent(i);
+		if(diff < 0){
+
+			diff *= -1;
+			//histoData2->SetBinContent(i,diff);
+
+		}
+
+	   }
+
+	   float sysUn = 0;
+
+	   for(int i=1; i<histoData2->GetSize(); i++){
+
+		float diff = histoData2->GetBinContent(i);
+		if(diff != 0){
+
+			sysUn += diff*diff;
+
+
+		}
+
+	   }
+	   std::cout<<"Tot. Sys. Uncertainty: "<<100*sqrt(sysUn)<<std::endl;
+
+	   histoData2->Fit("pol0");      
+	   //if(histoStructure[k].find("DiTauCandSSPt") != string::npos || histoStructure[k].find("DiTauCandSSEta") != string::npos) histoData2->Fit("pol7","","SAMES");              
 	   histoData2->SetTitle("");
-	   histoData2->GetYaxis()->SetTitle("(obs-exp)/exp");
+	   histoData2->GetYaxis()->SetTitle("(obs-exp)/obs");
 	   histoData2->GetYaxis()->SetTitleSize(0.06);
   	   histoData2->GetYaxis()->SetLabelSize(0.06);
 	   histoData2->GetXaxis()->SetTitleSize(0.06);
   	   histoData2->GetXaxis()->SetLabelSize(0.06);
+  	   histoData2->SetMaximum(+1);
+  	   histoData2->SetMinimum(-1);
   	   histoData2->SetMarkerColor(1);
   	   histoData2->SetMarkerStyle(20);
   	   histoData2->SetMarkerSize(0.5);
 	   histoData2->Draw("1ep");
+	   pad2->Update();
+	   TPaveText * box = new TPaveText(0.20,0.7,0.5,0.87, "NDC");
+	   box->AddText("i murt tu");
+	   box->SetFillColor(0);
+	   //box->Draw();
+	   pad2->Update();
+	   TPaveStats* st = (TPaveStats*) histoData2->FindObject("stats");
+	   if(st){
+
+		st->SetX1NDC(0.6);
+	   	st->SetX2NDC(0.9);
+	  	st->SetY1NDC(0.6);
+	   	st->SetY2NDC(0.9);
+	   	st->SetOptFit(0111);
+	   	st->Draw();
+
+	   }
+	   pad2->Update();
 
 	   std::string saveName;
            if(logScale_) saveName = "./Plots/" + process_ + "/plots_stack_log/" + histoNamesForSaving[k] + ".png";
