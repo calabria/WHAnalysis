@@ -29,10 +29,10 @@ options.register ('channel',
                   "Desired channel: mtt, ett or none")    
 
 options.register ('globaltag',
-                  'START53_V7F::All',
+                  'START53_V16::All',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.string,
-                  "Global Tag to use. Default: START53_V11::All")
+                  "Global Tag to use. Default: START53_V16::All")
 
 options.register ('includeSim',
                   False,
@@ -391,7 +391,7 @@ simpleCutsWP95 = "(userFloat('nHits')<=1"+ \
 
 process.skimmedMuons = cms.EDFilter("PATMuonSelector",
 	src = cms.InputTag("muonVariables"),
-	cut = cms.string("pt >= 20. && abs(eta) < 2.5 && isGlobalMuon && userFloat('PFRelIsoDB04v2') < 0.3"),
+	cut = cms.string("pt >= 20. && abs(eta) < 2.5 && isGlobalMuon && userFloat('PFRelIsoDB04v2') < 0.1"),
 	filter = cms.bool(True)
 )
 
@@ -441,7 +441,19 @@ if isMC:
 	process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3")
 else: 
 	process.calibratedAK5PFJetsForPFMEtMVA.correctors = cms.vstring("ak5PFL1FastL2L3Residual")
-#process.pfMEtMVA.srcLeptons = cms.VInputTag('isolatedPatElectrons', 'isolatedPatMuons', 'isolatedPatTaus')
+
+	process.isolatedPatElectrons = cms.EDFilter('PATElectronSelector',
+		src = cms.InputTag('selectedPatElectrons'),
+		cut = cms.string('pt > 20 && abs(eta) < 2.1 && electronID("mvaNonTrigV0") > 0.905 && userFloat("PFRelIsoDB04") < 0.1'))
+	process.isolatedPatMuons = cms.EDFilter('PATMuonSelector',
+		src = cms.InputTag('selectedPatMuons'),
+		cut = cms.string('pt > 20 && abs(eta) < 2.1 && isGlobalMuon() && userFloat("PFRelIsoDB04v2") < 0.1'))
+	process.isolatedPatTaus = cms.EDFilter('PATTauSelector',
+		src = cms.InputTag('selectedPatTaus'),
+		cut = cms.string('pt > 20 && abs(eta) < 2.3 && tauID("decayModeFinding") > 0.5 && (tauID("againstMuonLoose") > 0.5) && (tauID("againstElectronLoose") > 0.5 || tauID("againstElectronMVA") > 0.5 || tauID("againstElectronVLooseMVA2") > 0.5) & (tauID("byLooseCombinedIsolationDeltaBetaCorr") > 0.5 || tauID("byLooseIsolationMVA") > 0.5)'))
+
+	process.pfMEtMVA.srcLeptons = cms.VInputTag(cms.InputTag('isolatedPatElectrons'), cms.InputTag('isolatedPatMuons'), cms.InputTag('isolatedPatTaus'))
+	process.pfMEtMVA.verbosity = cms.int32(0)
 
 process.patPFMetByMVA = process.patMETs.clone(
 	metSource = cms.InputTag('pfMEtMVA'),
@@ -496,6 +508,11 @@ process.patPFMETsTypeIcorrected = process.patMETs.clone(
 	genMETSource = cms.InputTag('genMetTrue'),
 	addGenMET = cms.bool(False)
 )
+
+# apply type I/type I + II PFMEt corrections to pat::MET object
+# and estimate systematic uncertainties on MET
+#from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+#runMEtUncertainties(process)
 
 #--------------------------------------------------------------------------------
 
@@ -562,7 +579,8 @@ process.source.fileNames = [                    ##
 	'/store/mc/Summer12_DR53X/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v2/0002/FEAC0369-F0F0-E111-A459-001E6739702B.root'
 	#'/store/data/Run2012A/ElectronHad/AOD/13Jul2012-v1/00000/FEFA63C4-D4D0-E111-9F90-002618943857.root'
 
-   ]                                            ##  (e.g. 'file:AOD.root')
+
+   ]                                           ##  (e.g. 'file:AOD.root')
 #                                               ##
 process.maxEvents.input = 100                   ##  (e.g. -1 to run on all events)
 #
@@ -571,6 +589,8 @@ process.out.outputCommands = [ #'keep *'
 			       'keep patElectrons_electronVariables_*_*', 
 			       'keep patTaus_tauVariables_*_*', 
 			       'keep patJets_patJets_*_*',
+			       'keep patMETs_patType1CorrectedPFMet_*_*',
+			       'keep patMETs_patType1p2CorrectedPFMet_*_*',
 			       'keep patMETs_patMETsPF_*_*',
 			       'keep patMETs_patPFMETsTypeIcorrected_*_*',
 			       'keep patMETs_patPFMetByMVA_*_*',
