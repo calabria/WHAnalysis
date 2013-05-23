@@ -22,6 +22,7 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <sstream>
 #include <TMath.h>
 #include <cmath>
 // user include files
@@ -85,7 +86,7 @@ class CompositeCandHistManager : public edm::EDAnalyzer {
       // ----------member data ---------------------------
 
       std::map<std::string,TH1F*> histContainer_; 
-      std::map<std::string,TH2F*> histContainer2D_; 
+      std::map<std::string,TH2F*> histContainer2D_;
       edm::LumiReWeighting LumiWeights_;
 
       // input tags  
@@ -100,6 +101,8 @@ class CompositeCandHistManager : public edm::EDAnalyzer {
       vdouble TrueDist2011_f_;
       bool isMC_;
       int isFR_;
+      double wjetsCoeff_;
+      double zjetsCoeff_;
 
 };
 
@@ -652,7 +655,87 @@ namespace ZJetsTight{
 
 }
 
-std::vector<double> weightCalc(edm::View<reco::CompositeCandidate>::const_iterator CompCand){
+double corrSSTau(double pt, double eta, int type){
+
+	double value = 1;
+	int binPt = (int)pt/20;
+	int binEta = (int)(3+eta);
+
+	if(pt >= 100) binPt = 4;
+
+	double matrix_v1[5][6] ={
+		{0,0,0,0,0,0},
+		{1.55757,1.22742,0.706372,0.764892,1.3528,1.55739},
+		{1.92588,1.68548,0.702961,0.679257,1.70985,1.44714},
+		{1.96798,2.04543,0.494284,0.690546,1.28928,0.422058},
+		{1.28629,4.10797,0.796744,0.610567,0.815997,2.96383}
+	};
+
+	double matrix_v2[5][6] ={ 
+		{0,0,0,0,0,0},
+		{1.16236, 0.999142, 0.919625, 1.00174, 1.10042, 1.16026},
+		{1.44367, 1.40675,  0.917275, 0.882521,1.43005, 1.0847},
+		{1.28236, 1.55857,  0.585109, 0.812474,0.976749,0.276072},
+		{0.743917,2.85922,  0.866117, 0.672947,0.576554,1.74623},
+	};
+
+	double matrix_v3[5][6] ={ 
+		{0,0,0,0,0,0},
+		{1.28604,1.13487,1.05549,1.17374,1.22548,1.40059},
+		{0.902857,1.21784,0.893534,0.836269,1.07326,0.74975},
+		{0.628427,1.13314,0.504096,0.657499,0.583435,0.147976},
+		{0.329319,1.92922,0.698894,0.495738,0.314152,0.843332},
+	};
+
+	if(type == 1) value = matrix_v1[binPt][binEta];
+	else if(type == 2) value = matrix_v2[binPt][binEta];
+	else if(type == 3) value = matrix_v3[binPt][binEta];
+
+	return value;
+
+}
+
+double corrSSTauErr(double pt, double eta, int type){
+
+	double value = 1;
+	int binPt = (int)pt/20;
+	int binEta = (int)(3+eta);
+
+	if(pt >= 100) binPt = 4;
+
+	double matrix_v1[5][6] ={ 
+		{0,0,0,0,0,0},
+		{0.194458,0.0836845,0.051853,0.0543301,0.0871463,0.194463},
+		{0.485434,0.224845,0.115913,0.111992,0.220512,0.439027},
+		{0.989383,0.459975,0.174998,0.20861,0.358866,0.422556},
+		{1.28997,1.07033,0.356946,0.305697,0.47197,2.10963},
+	};
+
+	double matrix_v2[5][6] ={ 
+		{0,0,0,0,0,0},
+		{0.145176,0.0681441,0.0675444,0.0711939,0.0709157,0.144936},
+		{0.363862,0.187663,0.151269,0.145522,0.184429,0.329052},
+		{0.644672,0.350515,0.207162,0.245458,0.271886,0.276395},
+		{0.746045,0.745135,0.388044,0.33694,0.333492,1.24295},
+	};
+
+	double matrix_v3[5][6] ={ 
+		{0,0,0,0,0,0},
+		{0.160427,0.0773752,0.077488,0.0833799,0.0789263,0.174772},
+		{0.227545,0.162485,0.147336,0.137885,0.138436,0.227457},
+		{0.315939,0.254895,0.178474,0.198637,0.162423,0.148152},
+		{0.330272,0.502948,0.313116,0.248216,0.181724,0.60034},
+	};
+
+	if(type == 1) value = matrix_v1[binPt][binEta];
+	else if(type == 2) value = matrix_v2[binPt][binEta];
+	else if(type == 3) value = matrix_v3[binPt][binEta];
+
+	return value;
+
+}
+
+std::vector<double> weightCalc(edm::View<reco::CompositeCandidate>::const_iterator CompCand, double a, double b){
 
 	std::vector<double> weightVec;
 
@@ -678,27 +761,103 @@ std::vector<double> weightCalc(edm::View<reco::CompositeCandidate>::const_iterat
 	double weightSinglePtEtaParam;
 
 	if(isEleTau1SS){
+		
+		double value1 = corrSSTau(pt1, eta1, 1);
+		double value2 = corrSSTau(pt1, eta1, 2);
+		double value3 = corrSSTau(pt1, eta1, 3);
 
-		weightSinglePtParam     = (2*WJetsTight::fake_rate_tau_pt_20(pt1) + ZJetsTight::fake_rate_tau_pt_20(pt1))/3;
-		weightSinglePt3EtaParam = (2*WJetsTight::fake_rate_tau_pt_eta(pt1,eta1) + ZJetsTight::fake_rate_tau_pt_eta(pt1,eta1))/3;
-		weightSinglePtEtaParam  = (2*WJetsTight::fake_rate_tau(pt1,eta1) + ZJetsTight::fake_rate_tau(pt1,eta1))/3;
+		double value1Up = corrSSTau(pt1, eta1, 1) + corrSSTauErr(pt1, eta1, 1);
+		double value2Up = corrSSTau(pt1, eta1, 2) + corrSSTauErr(pt1, eta1, 2);
+		double value3Up = corrSSTau(pt1, eta1, 3) + corrSSTauErr(pt1, eta1, 3);
+
+		double value1Down = corrSSTau(pt1, eta1, 1) - corrSSTauErr(pt1, eta1, 1);
+		double value2Down = corrSSTau(pt1, eta1, 2) - corrSSTauErr(pt1, eta1, 2);
+		double value3Down = corrSSTau(pt1, eta1, 3) - corrSSTauErr(pt1, eta1, 3);
+
+		/*double value1 = 1;
+		double value2 = 1;
+		double value3 = 1;*/
+
+		weightSinglePtParam     = (a*WJetsTight::fake_rate_tau_pt_20(pt1) + b*ZJetsTight::fake_rate_tau_pt_20(pt1));
+		weightSinglePt3EtaParam = (a*WJetsTight::fake_rate_tau_pt_eta(pt1,eta1) + b*ZJetsTight::fake_rate_tau_pt_eta(pt1,eta1));
+		weightSinglePtEtaParam  = (a*WJetsTight::fake_rate_tau(pt1,eta1) + b*ZJetsTight::fake_rate_tau(pt1,eta1));
+
+		int binPt = (int)pt1/20;
+		int binEta = (int)(3+eta1);
+		if(pt1 >= 100) binPt = 4;
 
 		weightVec.push_back(weightSinglePtParam);
 		weightVec.push_back(weightSinglePt3EtaParam);
 		weightVec.push_back(weightSinglePtEtaParam);
-		std::cout<<"PT1: "<<pt1<<" chargeProd1: "<<isEleTau1SS<<" weight1: "<<weightSinglePtParam<<std::endl;
+		weightVec.push_back(weightSinglePtParam*value1);
+		weightVec.push_back(weightSinglePt3EtaParam*value2);
+		weightVec.push_back(weightSinglePtEtaParam*value3);
+		weightVec.push_back(weightSinglePtParam*value1Up);
+		weightVec.push_back(weightSinglePt3EtaParam*value2Up);
+		weightVec.push_back(weightSinglePtEtaParam*value3Up);
+		weightVec.push_back(weightSinglePtParam*value1Down);
+		weightVec.push_back(weightSinglePt3EtaParam*value2Down);
+		weightVec.push_back(weightSinglePtEtaParam*value3Down);
+
+		weightVec.push_back(binPt);
+		weightVec.push_back(binEta);
+
+		//if(DiTauCand->mass() > 160 && DiTauCand->mass() < 200) std::cout<<"PT1: "<<pt1<<" Eta1 "<<eta1<<" chargeProd1: "<<isEleTau1SS<<" weight1: "<<weightSinglePtParam<<std::endl;
+		//std::cout<<"Normal "<<weightVec[0]<<" NormCorr "<<weightVec[3]<<" Up "<<weightVec[6]<<" Down "<<weightVec[9]<<std::endl;
+		//if(DiTauCand->mass() > 160 && DiTauCand->mass() < 200) std::cout<<"Normal "<<weightVec[1]<<" NormCorr "<<weightVec[4]<<" Up "<<weightVec[7]<<" Down "<<weightVec[10]<<std::endl;
+		//std::cout<<"Value1 "<<value1<<" Value1Up "<<value1Up<<" Valu1Down "<<value1Down<<std::endl;
+		//if(DiTauCand->mass() > 160 && DiTauCand->mass() < 200) std::cout<<"Value2 "<<value2<<" Value2Up "<<value2Up<<" Valu2Down "<<value2Down<<std::endl;
+		//std::cout<<corrSSTauErr(pt1, eta1, 1)<<std::endl;
 
 	}
 	else{
 
-		weightSinglePtParam     = (2*WJetsMedium::fake_rate_tau_pt_20(pt2) + ZJetsMedium::fake_rate_tau_pt_20(pt2))/3;
-		weightSinglePt3EtaParam = (2*WJetsMedium::fake_rate_tau_pt_eta(pt2,eta2) + ZJetsMedium::fake_rate_tau_pt_eta(pt2,eta2))/3;
-		weightSinglePtEtaParam  = (2*WJetsMedium::fake_rate_tau(pt2,eta2) + ZJetsMedium::fake_rate_tau(pt2,eta2))/3;
+		double value1 = corrSSTau(pt2, eta2, 1);
+		double value2 = corrSSTau(pt2, eta2, 2);
+		double value3 = corrSSTau(pt2, eta2, 3);
+
+		double value1Up = corrSSTau(pt2, eta2, 1) + corrSSTauErr(pt2, eta2, 1);
+		double value2Up = corrSSTau(pt2, eta2, 2) + corrSSTauErr(pt2, eta2, 2);
+		double value3Up = corrSSTau(pt2, eta2, 3) + corrSSTauErr(pt2, eta2, 3);
+
+		double value1Down = corrSSTau(pt2, eta2, 1) - corrSSTauErr(pt2, eta2, 1);
+		double value2Down = corrSSTau(pt2, eta2, 2) - corrSSTauErr(pt2, eta2, 2);
+		double value3Down = corrSSTau(pt2, eta2, 3) - corrSSTauErr(pt2, eta2, 3);
+
+		/*double value1 = 1;
+		double value2 = 1;
+		double value3 = 1;*/
+
+		weightSinglePtParam     = (a*WJetsMedium::fake_rate_tau_pt_20(pt2) + b*ZJetsMedium::fake_rate_tau_pt_20(pt2));
+		weightSinglePt3EtaParam = (a*WJetsMedium::fake_rate_tau_pt_eta(pt2,eta2) + b*ZJetsMedium::fake_rate_tau_pt_eta(pt2,eta2));
+		weightSinglePtEtaParam  = (a*WJetsMedium::fake_rate_tau(pt2,eta2) + b*ZJetsMedium::fake_rate_tau(pt2,eta2));
+
+		int binPt = (int)pt2/20;
+		int binEta = (int)(3+eta2);
+		if(pt2 >= 100) binPt = 4;
 
 		weightVec.push_back(weightSinglePtParam);
 		weightVec.push_back(weightSinglePt3EtaParam);
 		weightVec.push_back(weightSinglePtEtaParam);
-		std::cout<<"PT2: "<<pt2<<" chargeProd2: "<<isEleTau1SS<<" weight2: "<<weightSinglePtParam<<std::endl;
+		weightVec.push_back(weightSinglePtParam*value1);
+		weightVec.push_back(weightSinglePt3EtaParam*value2);
+		weightVec.push_back(weightSinglePtEtaParam*value3);
+		weightVec.push_back(weightSinglePtParam*value1Up);
+		weightVec.push_back(weightSinglePt3EtaParam*value2Up);
+		weightVec.push_back(weightSinglePtEtaParam*value3Up);
+		weightVec.push_back(weightSinglePtParam*value1Down);
+		weightVec.push_back(weightSinglePt3EtaParam*value2Down);
+		weightVec.push_back(weightSinglePtEtaParam*value3Down);
+
+		weightVec.push_back(binPt);
+		weightVec.push_back(binEta);
+
+		//if(DiTauCand->mass() > 160 && DiTauCand->mass() < 200) std::cout<<"PT2: "<<pt2<<" Eta2 "<<eta2<<" chargeProd2: "<<isEleTau1SS<<" weight2: "<<weightSinglePtParam<<std::endl;
+		//std::cout<<"Normal "<<weightVec[0]<<" NormCorr "<<weightVec[3]<<" Up "<<weightVec[6]<<" Down "<<weightVec[9]<<std::endl;
+		//if(DiTauCand->mass() > 160 && DiTauCand->mass() < 200) std::cout<<"Normal "<<weightVec[1]<<" NormCorr "<<weightVec[4]<<" Up "<<weightVec[7]<<" Down "<<weightVec[10]<<std::endl;
+		//std::cout<<"Value1 "<<value1<<" Value1Up "<<value1Up<<" Valu1Down "<<value1Down<<std::endl;
+		//if(DiTauCand->mass() > 160 && DiTauCand->mass() < 200) std::cout<<"Value2 "<<value2<<" Value2Up "<<value2Up<<" Valu2Down "<<value2Down<<std::endl;
+		//std::cout<<corrSSTauErr(pt1, eta1, 1)<<std::endl;
 
 	}
 
@@ -724,7 +883,9 @@ CompositeCandHistManager::CompositeCandHistManager(const edm::ParameterSet& iCon
   MCDist_f_(iConfig.getUntrackedParameter<vdouble>("MCDist")),
   TrueDist2011_f_(iConfig.getUntrackedParameter<vdouble>("TrueDist2011")),
   isMC_(iConfig.getUntrackedParameter<bool>("isMC")),
-  isFR_(iConfig.getUntrackedParameter<int>("isFR",0))
+  isFR_(iConfig.getUntrackedParameter<int>("isFR",0)),
+  wjetsCoeff_(iConfig.getUntrackedParameter<double>("wjetsCoeff",0.6666666)),
+  zjetsCoeff_(iConfig.getUntrackedParameter<double>("zjetsCoeff",0.3333333))
 {
    //now do what ever initialization is needed
 
@@ -800,7 +961,7 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
 
   	for(edm::View<reco::CompositeCandidate>::const_iterator CompCand=CompCandidates->begin(); CompCand!=CompCandidates->end(); ++CompCand){
 
-		vdouble weightSingleCand = weightCalc(CompCand);
+		vdouble weightSingleCand = weightCalc(CompCand, wjetsCoeff_, zjetsCoeff_);
 		weightFR1 += (weightSingleCand[0]/(1 - weightSingleCand[0]));
 		weightFR2 += (weightSingleCand[1]/(1 - weightSingleCand[1]));
 		weightFR3 += (weightSingleCand[2]/(1 - weightSingleCand[2]));
@@ -824,6 +985,12 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
   for(edm::View<reco::CompositeCandidate>::const_iterator CompCand=CompCandidates->begin(); CompCand!=CompCandidates->end(); ++CompCand){
 
 	double weightTotEvt = 1;
+	double weightTotEvtCorr = 1;
+	double weightTotEvtUp = 1;
+	double weightTotEvtDown = 1;
+
+	int binPt = 0;
+	int binEta = 0;
 
   	if(isFR_){
 
@@ -831,14 +998,62 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
   		double weightFR2 = 0;
   		double weightFR3 = 0;
 
-		vdouble weightSingleCand = weightCalc(CompCand);
+		double weightFR1Corr = 0;
+  		double weightFR2Corr = 0;
+  		double weightFR3Corr = 0;
+
+		double weightFR1Up = 0;
+  		double weightFR2Up = 0;
+  		double weightFR3Up = 0;
+
+		double weightFR1Down = 0;
+  		double weightFR2Down = 0;
+  		double weightFR3Down = 0;
+
+		vdouble weightSingleCand = weightCalc(CompCand, wjetsCoeff_, zjetsCoeff_);
 		weightFR1 += (weightSingleCand[0]/(1 - weightSingleCand[0]));
 		weightFR2 += (weightSingleCand[1]/(1 - weightSingleCand[1]));
 		weightFR3 += (weightSingleCand[2]/(1 - weightSingleCand[2]));
 
-		if(isFR_ == 1) weightTotEvt = weightFR1;
-		else if(isFR_ == 2) weightTotEvt = weightFR2;
-		else if(isFR_ == 3) weightTotEvt = weightFR3;
+		weightFR1Corr += (weightSingleCand[3]/(1 - weightSingleCand[3]));
+		weightFR2Corr += (weightSingleCand[4]/(1 - weightSingleCand[4]));
+		weightFR3Corr += (weightSingleCand[5]/(1 - weightSingleCand[5]));
+
+		weightFR1Up += (weightSingleCand[6]/(1 - weightSingleCand[6]));
+		weightFR2Up += (weightSingleCand[7]/(1 - weightSingleCand[7]));
+		weightFR3Up += (weightSingleCand[8]/(1 - weightSingleCand[8]));
+
+		weightFR1Down += (weightSingleCand[9]/(1 - weightSingleCand[9]));
+		weightFR2Down += (weightSingleCand[10]/(1 - weightSingleCand[10]));
+		weightFR3Down += (weightSingleCand[11]/(1 - weightSingleCand[11]));
+
+		binPt = weightSingleCand[12];
+		binEta = weightSingleCand[13];
+
+		if(isFR_ == 1){
+
+		 	weightTotEvt = weightFR1;
+		 	weightTotEvtCorr = weightFR1Corr;
+		 	weightTotEvtUp = weightFR1Up;
+		 	weightTotEvtDown = weightFR1Down;
+
+		}
+		else if(isFR_ == 2){
+		 
+			weightTotEvt = weightFR2;
+		 	weightTotEvtCorr = weightFR2Corr;
+		 	weightTotEvtUp = weightFR2Up;
+		 	weightTotEvtDown = weightFR2Down;
+
+		}
+		else if(isFR_ == 3){
+
+			weightTotEvt = weightFR3;
+		 	weightTotEvtCorr = weightFR3Corr;
+		 	weightTotEvtUp = weightFR3Up;
+		 	weightTotEvtDown = weightFR3Down;
+
+		}
 
   	}
 
@@ -873,13 +1088,13 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
 	double DiTauCand2Pt = DiTauCand->daughter(1)->pt(); //Carica del secondo membro della coppia DiTau
 	double WLeptonCandPt = WLeptonCand->pt();
 	bool mostEnergetic = DiTauCand1Pt > DiTauCand2Pt ? true : false;
-	std::cout<<"ElePt "<<WLeptonCandPt<<" Tau1Pt "<<DiTauCand1Pt<<" Tau2Pt "<<DiTauCand2Pt<<std::endl;
+	//std::cout<<"ElePt "<<WLeptonCandPt<<" Tau1Pt "<<DiTauCand1Pt<<" Tau2Pt "<<DiTauCand2Pt<<std::endl;
 
 	bool includeEle = false;
 	bool includeTau1 = false;
 	bool includeTau2 = false;
 
-	if(WLepCandPtVec.size() > 1 && !isFR_){
+	if(WLepCandPtVec.size() > 0 && isFR_ == 0){
 
 		includeEle = std::find(WLepCandPtVec.begin(), WLepCandPtVec.end(), WLeptonCandPt)!=WLepCandPtVec.end();
 		includeTau1 = std::find(DiTauCand1PtVec.begin(), DiTauCand1PtVec.end(), DiTauCand1Pt)!=DiTauCand1PtVec.end();
@@ -899,16 +1114,64 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
 	double massWLeptonDiTauCand2 = (WLeptonCand->p4() + DiTauCand->daughter(1)->p4()).M();
 	double massHiggs = (DiTauCand->daughter(0)->p4() + DiTauCand->daughter(1)->p4()).M();
 
-	if(WLeptonDiTauCand1Charge){
+	if(WLeptonDiTauCand1Charge == 0){//Tau1 real (OS), Tau2 fakeable (SS) 
 
-		histContainer_["hMassWLeptonTauSS"]->Fill(massWLeptonDiTauCand2, weight*weightTotEvt);
 		histContainer_["hMassWLeptonTauOS"]->Fill(massWLeptonDiTauCand1, weight*weightTotEvt);
+		histContainer_["hMassWLeptonTauSS"]->Fill(massWLeptonDiTauCand2, weight*weightTotEvt);
+
+		histContainer_["hDiTauCandOSPt"]->Fill(DiTauCand1Pt, weight*weightTotEvt);
+   		histContainer_["hDiTauCandOSEta"]->Fill(DiTauCand1Eta, weight*weightTotEvt);
+		histContainer_["hDiTauCandSSPt"]->Fill(DiTauCand2Pt, weight*weightTotEvt);
+   		histContainer_["hDiTauCandSSEta"]->Fill(DiTauCand2Eta, weight*weightTotEvt);
+
+		histContainer_["hDiTauCandSSPtCorr"]->Fill(DiTauCand2Pt, weight*weightTotEvtCorr);
+   		histContainer_["hDiTauCandSSEtaCorr"]->Fill(DiTauCand2Eta, weight*weightTotEvtCorr);
+
+   		histContainer2D_["hDiTauCandOSEtaVsPt"]->Fill(DiTauCand1Pt, DiTauCand1Eta, weight*weightTotEvt);
+   		histContainer2D_["hDiTauCandSSEtaVsPt"]->Fill(DiTauCand2Pt, DiTauCand2Eta, weight*weightTotEvt);
+
+		if(isFR_ == 0){
+
+			histContainer_["hDiTauCandOSAntiTightIso"]->Fill(tau1.tauID("byTightCombinedIsolationDeltaBetaCorr"), weight*weightTotEvt);
+			histContainer_["hDiTauCandSSMediumIso"]->Fill(tau2.tauID("byMediumCombinedIsolationDeltaBetaCorr"), weight*weightTotEvt);
+
+		}
+		else{
+		
+			histContainer_["hDiTauCandOSAntiTightIso"]->Fill(tau1.tauID("byTightCombinedIsolationDeltaBetaCorr"), weight*weightTotEvt);
+			histContainer_["hDiTauCandSSAntiMediumIso"]->Fill(tau2.tauID("byMediumCombinedIsolationDeltaBetaCorr"), weight*weightTotEvt);
+
+		}
 
 	}
-	else{
+	else{//Tau1 fakeable (SS), Tau2 real (OS) 
 
-		histContainer_["hMassWLeptonTauSS"]->Fill(massWLeptonDiTauCand1, weight*weightTotEvt);
 		histContainer_["hMassWLeptonTauOS"]->Fill(massWLeptonDiTauCand2, weight*weightTotEvt);
+		histContainer_["hMassWLeptonTauSS"]->Fill(massWLeptonDiTauCand1, weight*weightTotEvt);
+
+		histContainer_["hDiTauCandOSPt"]->Fill(DiTauCand2Pt, weight*weightTotEvt);
+   		histContainer_["hDiTauCandOSEta"]->Fill(DiTauCand2Eta, weight*weightTotEvt);
+		histContainer_["hDiTauCandSSPt"]->Fill(DiTauCand1Pt, weight*weightTotEvt);
+   		histContainer_["hDiTauCandSSEta"]->Fill(DiTauCand1Eta, weight*weightTotEvt);
+
+		histContainer_["hDiTauCandSSPtCorr"]->Fill(DiTauCand2Pt, weight*weightTotEvtCorr);
+   		histContainer_["hDiTauCandSSEtaCorr"]->Fill(DiTauCand2Eta, weight*weightTotEvtCorr);
+
+   		histContainer2D_["hDiTauCandOSEtaVsPt"]->Fill(DiTauCand2Pt, DiTauCand2Eta, weight*weightTotEvt);
+   		histContainer2D_["hDiTauCandSSEtaVsPt"]->Fill(DiTauCand1Pt, DiTauCand1Eta, weight*weightTotEvt);
+
+		if(isFR_ == 0){
+
+			histContainer_["hDiTauCandSSTightIso"]->Fill(tau1.tauID("byTightCombinedIsolationDeltaBetaCorr"), weight*weightTotEvt);
+			histContainer_["hDiTauCandOSAntiMediumIso"]->Fill(tau2.tauID("byMediumCombinedIsolationDeltaBetaCorr"), weight*weightTotEvt);
+
+		}
+		else{
+		
+			histContainer_["hDiTauCandSSAntiTightIso"]->Fill(tau1.tauID("byTightCombinedIsolationDeltaBetaCorr"), weight*weightTotEvt);
+			histContainer_["hDiTauCandOSAntiMediumIso"]->Fill(tau2.tauID("byMediumCombinedIsolationDeltaBetaCorr"), weight*weightTotEvt);
+
+		}
 
 	}
 
@@ -1008,6 +1271,23 @@ CompositeCandHistManager::analyze(const edm::Event& iEvent, const edm::EventSetu
 	}
 
    	histContainer_["VisMass"]->Fill(massHiggs, weight*weightTotEvt);
+   	histContainer_["VisMassCorr"]->Fill(massHiggs, weight*weightTotEvtCorr);
+   	histContainer_["VisMassUp"]->Fill(massHiggs, weight*weightTotEvtUp);
+   	histContainer_["VisMassDown"]->Fill(massHiggs, weight*weightTotEvtDown);
+
+	std::stringstream nome1;
+	std::stringstream nome2;
+	std::stringstream nome3;
+
+	nome1 << "VisMassCorr" << (int)binPt << (int)binEta;
+	nome2 << "VisMassUp" << (int)binPt << (int)binEta;
+	nome3 << "VisMassDown" << (int)binPt << (int)binEta;
+
+	//std::cout<<nome1.str()<<" "<<nome2.str()<<" "<<nome3.str()<<std::endl;
+
+	histContainer_[nome1.str()]->Fill(massHiggs, weight*weightTotEvtCorr);
+   	histContainer_[nome2.str()]->Fill(massHiggs, weight*weightTotEvtUp);
+   	histContainer_[nome3.str()]->Fill(massHiggs, weight*weightTotEvtDown);
 
 	histContainer_["hCosDPhiETau1"]->Fill(cosTau1, weight*weightTotEvt);
 	histContainer_["hCosDPhiETau2"]->Fill(cosTau2, weight*weightTotEvt);
@@ -1037,30 +1317,80 @@ CompositeCandHistManager::beginJob()
   edm::Service<TFileService> fs;
   TH1::SetDefaultSumw2();
 
+  histContainer_["hDiTauCandOSAntiTightIso"]=fs->make<TH1F>("DiTauCandOSAntiTightIso", "DiTauCandOSAntiTightIso", 2, -0.5, 1.5);
+  histContainer_["hDiTauCandSSMediumIso"]=fs->make<TH1F>("DiTauCandSSMediumIso", "DiTauCandSSMediumIso", 2, -0.5, 1.5);
+  histContainer_["hDiTauCandSSAntiMediumIso"]=fs->make<TH1F>("DiTauCandSSAntiMediumIso", "DiTauCandSSAntiMediumIso", 2, -0.5, 1.5);
+
+  histContainer_["hDiTauCandSSTightIso"]=fs->make<TH1F>("DiTauCandSSTightIso", "DiTauCandSSTightIso", 2, -0.5, 1.5);
+  histContainer_["hDiTauCandOSAntiMediumIso"]=fs->make<TH1F>("DiTauCandOSAntiMediumIso", "DiTauCandOSAntiMediumIso", 2, -0.5, 1.5);
+  histContainer_["hDiTauCandSSAntiTightIso"]=fs->make<TH1F>("DiTauCandSSAntiTightIso", "DiTauCandSSAntiTightIso", 2, -0.5, 1.5);
+
   histContainer_["N_eventi"]=fs->make<TH1F>("N_eventi", "count",    2,   0., 2.);
   histContainer_["N_eventi_PU"]=fs->make<TH1F>("N_eventi_PU", "count",    2,   0., 2.);
   histContainer_["CompCand_mult"]=fs->make<TH1F>("CompCand_mult", "size", 20, 0.5,  20.5);
 
-  histContainer_["weightLep_1"]=fs->make<TH1F>("weightLep_1", "weightLep_1", 50, 0., 0.5);
-  histContainer_["weightLep_2"]=fs->make<TH1F>("weightLep_2", "weightLep_2", 50, 0., 0.5);
-  histContainer_["weightLep_3"]=fs->make<TH1F>("weightLep_3", "weightLep_3", 50, 0., 0.5);
+  histContainer_["weightLep_1"]=fs->make<TH1F>("weightLep_1", "weightLep_1", 50, 0., 0.1);
+  histContainer_["weightLep_2"]=fs->make<TH1F>("weightLep_2", "weightLep_2", 50, 0., 0.1);
+  histContainer_["weightLep_3"]=fs->make<TH1F>("weightLep_3", "weightLep_3", 50, 0., 0.1);
 
   histContainer_["trigMatch1"]=fs->make<TH1F>("trigMatch1", "trigMatch1", 2, 0, 2);
   histContainer_["trigMatch2"]=fs->make<TH1F>("trigMatch2", "trigMatch2", 2, 0, 2);
 
   histContainer_["hDiTauCand1Pt"]=fs->make<TH1F>("DiTauCand1Pt", "DiTauCand1Pt", 25, 0, 100);
-  histContainer_["hDiTauCand1Eta"]=fs->make<TH1F>("DiTauCand1Eta", "DiTauCand1Eta",  100, -5,  5);
+  histContainer_["hDiTauCand1Eta"]=fs->make<TH1F>("DiTauCand1Eta", "DiTauCand1Eta",  24, -3,  3);
   histContainer_["hDiTauCand1Phi"]=fs->make<TH1F>("DiTauCand1Phi", "DiTauCand1Phi",  36,   -TMath::Pi(), +TMath::Pi());
 
   histContainer_["hDiTauCand2Pt"]=fs->make<TH1F>("DiTauCand2Pt", "DiTauCand2Pt", 25, 0, 100);
-  histContainer_["hDiTauCand2Eta"]=fs->make<TH1F>("DiTauCand2Eta", "DiTauCand2Eta",  100, -5,  5);
+  histContainer_["hDiTauCand2Eta"]=fs->make<TH1F>("DiTauCand2Eta", "DiTauCand2Eta",  24, -3,  3);
   histContainer_["hDiTauCand2Phi"]=fs->make<TH1F>("DiTauCand2Phi", "DiTauCand2Phi",  36,   -TMath::Pi(), +TMath::Pi());
 
+  histContainer_["hDiTauCandOSPt"]=fs->make<TH1F>("DiTauCandOSPt", "DiTauCandOSPt", 25, 0, 100);
+  histContainer_["hDiTauCandOSEta"]=fs->make<TH1F>("DiTauCandOSEta", "DiTauCandOSEta",  24, -3,  3);
+
+  histContainer_["hDiTauCandSSPt"]=fs->make<TH1F>("DiTauCandSSPt", "DiTauCandSSPt", 25, 0, 100);
+  histContainer_["hDiTauCandSSEta"]=fs->make<TH1F>("DiTauCandSSEta", "DiTauCandSSEta",  24, -3,  3);
+
+  histContainer_["hDiTauCandSSPtCorr"]=fs->make<TH1F>("DiTauCandSSPtCorr", "DiTauCandSSPt", 25, 0, 100);
+  histContainer_["hDiTauCandSSEtaCorr"]=fs->make<TH1F>("DiTauCandSSEtaCorr", "DiTauCandSSEta",  24, -3,  3);
+
+  histContainer2D_["hDiTauCandOSEtaVsPt"]=fs->make<TH2F>("hDiTauCandOSEtaVsPt", "hDiTauCandOSEtaVsPt", 25, 0, 100, 24, -3,  3);
+  histContainer2D_["hDiTauCandSSEtaVsPt"]=fs->make<TH2F>("hDiTauCandSSEtaVsPt", "hDiTauCandSSEtaVsPt", 25, 0, 100, 24, -3,  3);
+
   histContainer_["hWLepCandPt"]=fs->make<TH1F>("WLepCandPt", "WLepCandPt", 25, 0, 100);
-  histContainer_["hWLepCandEta"]=fs->make<TH1F>("WLepCandEta", "WLepCandEta",  100, -5,  5);
+  histContainer_["hWLepCandEta"]=fs->make<TH1F>("WLepCandEta", "WLepCandEta",  24, -3,  3);
   histContainer_["hWLepCandPhi"]=fs->make<TH1F>("WLepCandPhi", "WLepCandPhi",  36,   -TMath::Pi(), +TMath::Pi());
 
   histContainer_["VisMass"]=fs->make<TH1F>("VisMass", "mass", 10, 0., 400.);
+  histContainer_["VisMassCorr"]=fs->make<TH1F>("VisMassCorr", "mass", 10, 0., 400.);
+  histContainer_["VisMassUp"]=fs->make<TH1F>("VisMassUp", "mass", 10, 0., 400.);
+  histContainer_["VisMassDown"]=fs->make<TH1F>("VisMassDown", "mass", 10, 0., 400.);
+
+  for(int i = 0; i < 5; i++){
+
+	for(int j = 0; j < 6 ; j++){
+
+		std::stringstream name1;
+		std::stringstream name2;
+		std::stringstream name3;
+
+		name1 << "VisMassCorr" << i << j;
+		name2 << "VisMassUp" << i << j;
+		name3 << "VisMassDown" << i << j;
+
+		std::string s1 = name1.str();
+		std::string s2 = name2.str();
+		std::string s3 = name3.str();
+
+		//std::cout<<name1.str()<<" "<<name2.str()<<" "<<name3.str()<<std::endl;
+
+  		histContainer_[name1.str()]=fs->make<TH1F>(s1.c_str(), "mass", 10, 0., 400.);
+  		histContainer_[name2.str()]=fs->make<TH1F>(s2.c_str(), "mass", 10, 0., 400.);
+  		histContainer_[name3.str()]=fs->make<TH1F>(s3.c_str(), "mass", 10, 0., 400.);
+
+	}
+
+  } 
+
   histContainer_["MTeMET"]=fs->make<TH1F>("MTeMET", "MTeMET", 25, 0., 200.);
 
   histContainer_["hCosDPhiETau1"]=fs->make<TH1F>("cosTau1", "cosTau1", 50, -1, 1);
@@ -1072,8 +1402,8 @@ CompositeCandHistManager::beginJob()
 
   histContainer2D_["hMtMet"]=fs->make<TH2F>("MtMet", "MtMet", 25, 0., 200., 40, 0., 200.);
 
-  histContainer_["MET"]=fs->make<TH1F>("MET", "met",    80,   0., 200.);
-  histContainer_["hLt"]=fs->make<TH1F>("Lt", "Lt",50, 0,200);
+  histContainer_["MET"]=fs->make<TH1F>("MET", "met", 50, 0, 200);
+  histContainer_["hLt"]=fs->make<TH1F>("Lt", "Lt", 50, 0,200);
 
   histContainer_["hWLeptonLeadTauCharge"]=fs->make<TH1F>("WLeptonLeadTauCharge", "WLeptonLeadTauCharge", 7, -3.5, +3.5);
   histContainer_["hWLeptonSubLeadTauCharge"]=fs->make<TH1F>("WLeptonSubLeadTauCharge", "WLeptonSubLeadTauCharge", 7, -3.5, +3.5);
@@ -1108,11 +1438,26 @@ CompositeCandHistManager::beginJob()
   histContainer_["hDiTauCand2Eta"]->GetXaxis()->SetTitle("#eta");
   histContainer_["hDiTauCand2Phi"]->GetXaxis()->SetTitle("#phi");
 
+  histContainer_["hDiTauCandOSPt"]->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+  histContainer_["hDiTauCandOSEta"]->GetXaxis()->SetTitle("#eta");
+
+  histContainer_["hDiTauCandSSPt"]->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+  histContainer_["hDiTauCandSSEta"]->GetXaxis()->SetTitle("#eta");
+
+  histContainer_["hDiTauCandSSPtCorr"]->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+  histContainer_["hDiTauCandSSEtaCorr"]->GetXaxis()->SetTitle("#eta");
+
+  histContainer2D_["hDiTauCandOSEtaVsPt"]->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+  histContainer2D_["hDiTauCandSSEtaVsPt"]->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+
   histContainer_["hWLepCandPt"]->GetXaxis()->SetTitle("p_{T} [GeV/c]");
   histContainer_["hWLepCandEta"]->GetXaxis()->SetTitle("#eta");
   histContainer_["hWLepCandPhi"]->GetXaxis()->SetTitle("#phi");
 
   histContainer_["VisMass"]->GetXaxis()->SetTitle("Vis.Mass [GeV/c^{2}]");
+  histContainer_["VisMassCorr"]->GetXaxis()->SetTitle("Vis.Mass Corr. [GeV/c^{2}]");
+  histContainer_["VisMassUp"]->GetXaxis()->SetTitle("Vis.Mass Up [GeV/c^{2}]");
+  histContainer_["VisMassDown"]->GetXaxis()->SetTitle("Vis.Mass Down [GeV/c^{2}]");
   histContainer_["MTeMET"]->GetXaxis()->SetTitle("M_{T} (l_{W}, MET) [GeV/c^{2}]");
 
   histContainer_["MET"]->GetXaxis()->SetTitle("MET [GeV]");
@@ -1142,6 +1487,9 @@ CompositeCandHistManager::beginJob()
   histContainer2D_["hMassWLeptonSubLeadTauVsMET"]->GetXaxis()->SetTitle("Vis.Mass (l_{W},#tau_{sublead}) [GeV/c^{2}]");
 
 ///////////////////////////////////////////////////////////// Y axis
+
+  histContainer2D_["hDiTauCandOSEtaVsPt"]->GetYaxis()->SetTitle("#eta");
+  histContainer2D_["hDiTauCandSSEtaVsPt"]->GetYaxis()->SetTitle("#eta");
 
   histContainer2D_["hMassWLeptonLeadTauVsPtHiggs"]->GetYaxis()->SetTitle("HiggsCand p_{T} [GeV/c]");
   histContainer2D_["hMassWLeptonSubLeadTauVsPtHiggs"]->GetYaxis()->SetTitle("HiggsCand p_{T} [GeV/c]");
