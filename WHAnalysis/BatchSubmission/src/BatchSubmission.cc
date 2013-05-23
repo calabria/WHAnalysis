@@ -84,7 +84,7 @@ BatchSubmission::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    std::cout<<"size "<<sizeInput-1<<std::endl;
    int cont = 1;
 
-   int upperLimit = (int)((sizeInput-1)/10)+1;
+   int upperLimit = (int)((sizeInput-1)/20)+1;
 
    for(int i = 1; i <= upperLimit; i++){ //Loop sui file di input
 
@@ -114,8 +114,8 @@ BatchSubmission::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 			else if(foundOutput!=string::npos) choice = 2;
 			else choice = 3;
 
-			int maxFor = i*10 - 1;
-			int minFor = i*10 - 10;
+			int maxFor = i*20 - 1;
+			int minFor = i*20 - 20;
 
 	    		if(outputCFG.is_open()){
 				switch(choice){

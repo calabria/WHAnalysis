@@ -150,6 +150,11 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 #################################################################################################################################
 
+#process.selectedTausPt1.cut = cms.string('pt > 25.0')
+#process.selectedTausPt2.cut = cms.string('pt > 20.0')
+
+#process.selectedElectronsIso.cut = cms.string("userFloat('PFRelIsoDB04') > 0.3")
+
 process.selectedEvents = cms.EDAnalyzer('SelectedEvents',
 	path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Events/EventsETT_Signal_MET/"),
         muonSrc = cms.untracked.InputTag("muonVariables"),
@@ -235,8 +240,8 @@ process.mypath = cms.Path(#process.skimmingSequence *
 			  process.CompCandHistosAfterSelLt *
 			  process.CompCandHistosAfterSelLt1 *
 			  process.CompCandHistosAfterSelLt2 *
-			  process.CompCandHistosAfterSelLt3 *
-			  process.selectedEvents
+			  process.CompCandHistosAfterSelLt3 
+			  #process.selectedEvents
 )
 
 #process.outp1=cms.OutputModule("PoolOutputModule",

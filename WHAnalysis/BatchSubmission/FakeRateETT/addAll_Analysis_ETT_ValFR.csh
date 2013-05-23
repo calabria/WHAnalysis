@@ -14,5 +14,5 @@ done
 
 cd $path
 hadd histo_data_FR1.root histo_TauPlusX*FR1*
-hadd histo_data_FR2.root histo_TauPlusX*FR2*
-hadd histo_data_FR.root histo_TauPlusX*FR*
+#hadd histo_data_FR2.root histo_TauPlusX*FR2*
+#hadd histo_data_FR.root histo_TauPlusX*FR*

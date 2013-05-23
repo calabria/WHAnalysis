@@ -180,11 +180,11 @@ process.p = cms.Path(
 	process.TauPlusX_RunB_13Jul2012_FR1 + 
 	process.TauPlusX_RunC_24Aug2012_FR1 + 
 	process.TauPlusX_RunC_PRv2_FR1 +
-	process.TauPlusX_RunD_PRv1_FR1 +
-	process.TauPlusX_RunA_06Aug2012_FR2 + 
-	process.TauPlusX_RunA_13Jul2012_FR2 + 
-	process.TauPlusX_RunB_13Jul2012_FR2 + 
-	process.TauPlusX_RunC_24Aug2012_FR2 + 
-	process.TauPlusX_RunC_PRv2_FR2 +
-	process.TauPlusX_RunD_PRv1_FR2
+	process.TauPlusX_RunD_PRv1_FR1
+	#process.TauPlusX_RunA_06Aug2012_FR2 + 
+	#process.TauPlusX_RunA_13Jul2012_FR2 + 
+	#process.TauPlusX_RunB_13Jul2012_FR2 + 
+	#process.TauPlusX_RunC_24Aug2012_FR2 + 
+	#process.TauPlusX_RunC_PRv2_FR2 +
+	#process.TauPlusX_RunD_PRv1_FR2
 )

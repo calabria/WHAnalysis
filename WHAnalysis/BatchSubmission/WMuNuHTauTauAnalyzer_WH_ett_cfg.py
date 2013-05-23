@@ -141,6 +141,9 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 #################################################################################################################################
 
+#process.selectedTausPt1.cut = cms.string('pt > 25.0')
+#process.selectedTausPt2.cut = cms.string('pt > 20.0')
+
 process.selectedEvents = cms.EDAnalyzer('SelectedEvents',
 	path = cms.untracked.string("/lustre/cms/store/user/calabria/Data/Events/EventsETT_Signal_MET/"),
         muonSrc = cms.untracked.InputTag("muonVariables"),

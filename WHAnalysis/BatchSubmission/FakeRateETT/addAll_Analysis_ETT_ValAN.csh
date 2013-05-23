@@ -2,7 +2,7 @@
 
 path=/lustre/cms/store/user/calabria/Data/Analisi_53X/ETT
 
-rm $path/histo_*
+rm $path/histo_*AN*
 
 for i in `cat ListDirectories2.txt`; do
 
@@ -14,10 +14,4 @@ done
 
 cd $path
 
-hadd histo_WZ_AN.root histo_WZ*AN*
-
-hadd histo_ZZ_AN.root histo_ZZ*AN*
-
 hadd histo_data_AN1.root histo_TauPlusX*AN1*
-hadd histo_data_AN2.root histo_TauPlusX*AN2*
-hadd histo_data_AN.root histo_TauPlusX*AN*

@@ -1,14 +1,14 @@
 #!/bin/bash
 
-ls -l  /lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC_ETT_2/ | grep root | awk '{print $9}'
+ls -l  /lustre/cms/store/user/calabria/Data/PAT2012_MC_ETT_14Ott/ | grep root | awk '{print $9}'
 
 back=$1
 
 finalState=$2
 
 if [ $? -eq 0 ]; then
-input=`ls -l  /lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC_ETT_2/$back | grep root | awk '{print $9}' `
-ntotfiles=`ls -l  /lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC_ETT_2/$back | grep root | awk '{print $9}' | wc -l`
+input=`ls -l  /lustre/cms/store/user/calabria/Data/PAT2012_MC_ETT_14Ott/$back | grep patTuple | awk '{print $9}' `
+ntotfiles=`ls -l  /lustre/cms/store/user/calabria/Data/PAT2012_MC_ETT_14Ott/$back | grep patTuple | awk '{print $9}' | wc -l`
 
 echo $input > filelistData.txt
 echo $ntotfiles
@@ -21,7 +21,7 @@ filelist=`cat filelistData.txt`
 echo Filelist $filelist
 
 for filename in $filelist ; do
-echo "/lustre/cms/store/user/calabria/Data/PAT2011_NoSkim_MC_ETT_2/$back/$filename" >> $back$finalState.txt
+echo "/lustre/cms/store/user/calabria/Data/PAT2012_MC_ETT_14Ott/$back/$filename" >> $back$finalState.txt
 
 
 done

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -r /lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/
+#rm -r /lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/
 mkdir /lustre/cms/store/user/calabria/Data/Analisi_53X/
 mkdir /lustre/cms/store/user/calabria/Data/Analisi_53X/ETT/
 

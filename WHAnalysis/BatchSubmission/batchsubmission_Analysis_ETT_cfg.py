@@ -709,7 +709,7 @@ process.TauPlusX_RunD_PRv1 = cms.EDAnalyzer('BatchSubmission',
 
 
 process.p = cms.Path(
-	#process.DYJetsToLL_ett +
+	process.DYJetsToLL_ett +
 	#process.DYToEE_ett +
 	#process.DYToMuMu_ett +
 	#process.DYToTauTau_ett +
@@ -746,9 +746,9 @@ process.p = cms.Path(
 	#process.ZH_150_ett +
 	#process.ZH_155_ett +
 	#process.ZH_160_ett +
-	#process.TTJets_ett +
-	#process.WJets_v1_ett +
-	#process.WJets_v2_ett +
+	process.TTJets_ett +
+	process.WJets_v1_ett +
+	process.WJets_v2_ett +
 	#process.W1Jets_ett +
 	#process.W2Jets_ett +
 	#process.W3Jets_ett +

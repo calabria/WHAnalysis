@@ -140,6 +140,9 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 #################################################################################################################################
 
+#process.selectedTausPt1.cut = cms.string('pt > 25.0')
+#process.selectedTausPt2.cut = cms.string('pt > 20.0')
+
 process.selectedTausIso.cut = cms.string('tauID("byTightCombinedIsolationDeltaBetaCorr") < 0.5')
 process.selectedTausIso2.cut = cms.string('tauID("byMediumCombinedIsolationDeltaBetaCorr") > 0.5 && (triggerObjectMatchesByPath("HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*").size() > 0.5 || triggerObjectMatchesByPath("HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v*").size() > 0.5)')
 
@@ -183,13 +186,13 @@ process.selectedCompCandUW.CompCandSrc = cms.untracked.InputTag("selectedCompCan
 ############### Signal veto
 
 process.selectedTau1Sign = cms.EDFilter("PATTauSelector",
-	src = cms.InputTag("selectedTausByDeltaR:TauSelByDeltaR"),
+	src = cms.InputTag("selectedTausID"),
 	cut = cms.string('tauID("byTightCombinedIsolationDeltaBetaCorr") > 0.5 && tauID("againstMuonTight") > 0.5 && tauID("againstElectronTight") > 0.5'),
 	filter = cms.bool(False)
 	)
 
 process.selectedTau2Sign = cms.EDFilter("PATTauSelector",
-	src = cms.InputTag("selectedTausByDeltaR:TauSelByDeltaR"),
+	src = cms.InputTag("selectedTausID2"),
 	cut = cms.string('tauID("byMediumCombinedIsolationDeltaBetaCorr") > 0.5 && tauID("againstMuonTight") > 0.5 && tauID("againstElectronMedium") > 0.5'),
 	filter = cms.bool(False)
 	)

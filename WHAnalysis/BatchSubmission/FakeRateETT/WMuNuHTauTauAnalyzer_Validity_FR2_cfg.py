@@ -143,8 +143,10 @@ process.out = cms.OutputModule("PoolOutputModule",
 process.selectedTausPt1.cut = cms.string('pt > 25.0')
 process.selectedTausPt2.cut = cms.string('pt > 20.0')
 
-process.selectedTausIso.cut = cms.string('tauID("byLooseCombinedIsolationDeltaBetaCorr") > 0.5 && (triggerObjectMatchesByPath("HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*").size() > 0.5 || triggerObjectMatchesByPath("HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v*").size() > 0.5)')
+process.selectedTausIso.cut = cms.string('tauID("byTightCombinedIsolationDeltaBetaCorr") < 0.5 && (triggerObjectMatchesByPath("HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*").size() > 0.5 || triggerObjectMatchesByPath("HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v*").size() > 0.5)')
 process.selectedTausIso2.cut = cms.string('tauID("byMediumCombinedIsolationDeltaBetaCorr") < 0.5')
+
+process.selectedTauTauPairsByCharge.DiTauTag = cms.untracked.InputTag("selectedTauTauPairsDeltaR:selectedCand1Cand2PairsDeltaR")
 
 process.selectedCompCandCharge = cms.EDFilter("CompCandChargeFilter",
 	CompCandSrc = cms.untracked.InputTag("ztautauVeto"),
@@ -295,7 +297,7 @@ process.mypath = cms.Path(#process.skimmingSequence *
 			  process.jetSequence *
 			  process.CompCandHistosBeforeMet *
 			  process.selectedMETMax *
-			  process.sequenceSgn *
+			  #process.sequenceSgn *
 			  process.CompCandHistosAfterSelLt *
 			  process.CompCandHistosAfterSelLt1 *
 			  process.CompCandHistosAfterSelLt2 *

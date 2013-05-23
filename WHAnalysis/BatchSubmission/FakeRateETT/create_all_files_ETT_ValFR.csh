@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #rm -r /lustre/cms/store/user/calabria/Data/Analisi_53X/ETT_ValFR/
-mkdir /lustre/cms/store/user/calabria/Data/Analisi_53X/
-mkdir /lustre/cms/store/user/calabria/Data/Analisi_53X/ETT_ValFR/
+#mkdir /lustre/cms/store/user/calabria/Data/Analisi_53X/
+#mkdir /lustre/cms/store/user/calabria/Data/Analisi_53X/ETT_ValFR/
 
 cd $CMSSW_BASE/src/WHAnalysis/BatchSubmission/FakeRateETT/
 

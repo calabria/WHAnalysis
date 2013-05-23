@@ -130,54 +130,65 @@ process.CompCandHistosBeforeZeeStep4.isMC = cms.untracked.bool(isMCBool.value())
 
 #################################################################################################################################
 
-process.out = cms.OutputModule("PoolOutputModule",
-                fileName = cms.untracked.string("test.root"),
-		outputCommands = cms.untracked.vstring(
-		'keep *',
-      		#"keep *_*_*_EleTauAnalyzer"
-		)
-        )
+#process.out = cms.OutputModule("PoolOutputModule",
+#                fileName = cms.untracked.string(
+#		),
+#		outputCommands = cms.untracked.vstring(
+#		'keep *',
+#      		#"keep *_*_*_EleTauAnalyzer"
+#		)
+#        )
 
 #################################################################################################################################
 
 process.selectedTausPt1.cut = cms.string('pt > 25.0')
 process.selectedTausPt2.cut = cms.string('pt > 20.0')
 
-process.selectedTausIso.cut = cms.string('tauID("byTightCombinedIsolationDeltaBetaCorr") < 0.5')
-process.selectedTausIso2.cut = cms.string('tauID("byLooseCombinedIsolationDeltaBetaCorr") > 0.5 && (triggerObjectMatchesByPath("HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*").size() > 0.5 || triggerObjectMatchesByPath("HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v*").size() > 0.5)')
+#process.selectedElectronsIso.cut = cms.string("userFloat('PFRelIsoDB04') > 0.3")
 
-process.selectedCompCandCharge = cms.EDFilter("CompCandChargeFilter",
+process.selectedTausIso.cut = cms.string('')
+process.selectedTausIso2.cut = cms.string('')
+
+process.selectedCompCandCharge = cms.EDFilter("CompCandIsoFilter",
 	CompCandSrc = cms.untracked.InputTag("ztautauVeto"),
-	applyCharge1 = cms.untracked.bool(True), #is SS with e??
-	applyCharge2 = cms.untracked.bool(False),
+        isFR = cms.untracked.bool(True),
+        condVec = cms.untracked.vdouble(0,0), #0,0 per CR; 1,0 per fake nella regione tight signal
 	filter = cms.bool(True)
 	)
 
+process.selectedTauTauPairsByCharge.DiTauTag = cms.untracked.InputTag("selectedTauTauPairsDeltaR:selectedCand1Cand2PairsDeltaR")
+
 process.CompCandHistosAfterSelLt1 = cms.EDAnalyzer('CompositeCandHistManager',
-       CompCandSrc = cms.untracked.InputTag("selectedCompCandUW"),
-       PFMetTag = cms.untracked.InputTag('patPFMetByMVA'),
-       MCDist = cms.untracked.vdouble(1),
-       TrueDist2011 = cms.untracked.vdouble(1),
-       isMC = cms.untracked.bool(False),
-       isFR = cms.untracked.int32(1),
+       	CompCandSrc = cms.untracked.InputTag("selectedCompCandUW"),
+       	PFMetTag = cms.untracked.InputTag('patPFMetByMVA'),
+       	MCDist = cms.untracked.vdouble(1),
+       	TrueDist2011 = cms.untracked.vdouble(1),
+       	isMC = cms.untracked.bool(False),
+       	isFR = cms.untracked.int32(1),
+	wjetsCoeff = cms.untracked.double(1),
+	zjetsCoeff = cms.untracked.double(0),
 )
 
 process.CompCandHistosAfterSelLt2 = cms.EDAnalyzer('CompositeCandHistManager',
-       CompCandSrc = cms.untracked.InputTag("selectedCompCandUW"),
-       PFMetTag = cms.untracked.InputTag('patPFMetByMVA'),
-       MCDist = cms.untracked.vdouble(1),
-       TrueDist2011 = cms.untracked.vdouble(1),
-       isMC = cms.untracked.bool(False),
-       isFR = cms.untracked.int32(2),
+       	CompCandSrc = cms.untracked.InputTag("selectedCompCandUW"),
+       	PFMetTag = cms.untracked.InputTag('patPFMetByMVA'),
+       	MCDist = cms.untracked.vdouble(1),
+       	TrueDist2011 = cms.untracked.vdouble(1),
+       	isMC = cms.untracked.bool(False),
+       	isFR = cms.untracked.int32(2),
+	wjetsCoeff = cms.untracked.double(1),
+	zjetsCoeff = cms.untracked.double(0),
 )
 
 process.CompCandHistosAfterSelLt3 = cms.EDAnalyzer('CompositeCandHistManager',
-       CompCandSrc = cms.untracked.InputTag("selectedCompCandUW"),
-       PFMetTag = cms.untracked.InputTag('patPFMetByMVA'),
-       MCDist = cms.untracked.vdouble(1),
-       TrueDist2011 = cms.untracked.vdouble(1),
-       isMC = cms.untracked.bool(False),
-       isFR = cms.untracked.int32(3),
+       	CompCandSrc = cms.untracked.InputTag("selectedCompCandUW"),
+       	PFMetTag = cms.untracked.InputTag('patPFMetByMVA'),
+       	MCDist = cms.untracked.vdouble(1),
+       	TrueDist2011 = cms.untracked.vdouble(1),
+       	isMC = cms.untracked.bool(False),
+       	isFR = cms.untracked.int32(3),
+	wjetsCoeff = cms.untracked.double(1),
+	zjetsCoeff = cms.untracked.double(0),
 )
 
 process.CompCandHistosAfterSel.CompCandSrc = cms.untracked.InputTag("selectedCompCandCharge")
@@ -295,19 +306,23 @@ process.mypath = cms.Path(#process.skimmingSequence *
 			  process.jetSequence *
 			  process.CompCandHistosBeforeMet *
 			  process.selectedMETMax *
-			  process.sequenceSgn *
+			  #process.sequenceSgn *
 			  process.CompCandHistosAfterSelLt *
 			  process.CompCandHistosAfterSelLt1 *
 			  process.CompCandHistosAfterSelLt2 *
 			  process.CompCandHistosAfterSelLt3
 )
 
-#process.outp1 = cms.OutputModule("PoolOutputModule",
-#        fileName = cms.untracked.string('savep1.root'),
-#        SelectEvents = cms.untracked.PSet(
-#                SelectEvents = cms.vstring('mypath')
-#                )
-#        )   
+process.outp1 = cms.OutputModule("PoolOutputModule",
+        fileName = cms.untracked.string(
 
-#process.outpath = cms.EndPath(process.out)
+		#__outpuFile
+
+	),
+        SelectEvents = cms.untracked.PSet(
+                SelectEvents = cms.vstring('mypath')
+                )
+        )   
+
+#process.outpath = cms.EndPath(process.outp1)
 
